@@ -1,0 +1,2714 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Redes do Zero ao Avançado — Mariana BS</title>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --paper: #f5f0e8;
+  --paper-dark: #ede7d9;
+  --paper-shadow: #d8d0c0;
+  --ink: #1a1610;
+  --ink-mid: #3a3028;
+  --ink-light: #6b5f50;
+  --ink-faint: #9a8f80;
+  --red-ink: #8b1a1a;
+  --blue-ink: #1a3a6b;
+  --green-ink: #1a4a2a;
+  --rule: rgba(26,22,16,0.18);
+  --rule-strong: rgba(26,22,16,0.45);
+  --accent: #5a1e00;
+  --page-w: 860px;
+  --mono: 'Courier Prime', 'Courier New', monospace;
+  --serif: 'IM Fell English', Georgia, serif;
+  --type: 'Special Elite', 'Courier New', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: #2a2520;
+  font-family: var(--mono);
+  color: var(--ink);
+  min-height: 100vh;
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(80,60,40,0.4) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(60,40,20,0.3) 0%, transparent 50%);
+}
+
+/* ── HEADER BAR ── */
+.site-header {
+  background: #1a1610;
+  border-bottom: 3px double #5a4a30;
+  padding: 10px 0;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.site-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 28px;
+}
+.site-brand {
+  font-family: var(--type);
+  color: #c8b88a;
+  font-size: 0.88rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.site-brand span { color: #e8c870; }
+.site-nav-pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.site-nav-pills a {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: #9a8a6a;
+  text-decoration: none;
+  padding: 3px 8px;
+  border: 1px solid #3a3020;
+  border-radius: 2px;
+  transition: all 0.15s;
+  letter-spacing: 0.04em;
+}
+.site-nav-pills a:hover { color: #c8b88a; border-color: #5a4a30; background: rgba(200,184,138,0.08); }
+
+/* hide hamburger on desktop where pills are visible */
+@media (min-width: 961px) {
+  .menu-btn { display: none; }
+}
+
+/* ── HAMBURGER MENU ── */
+.menu-btn {
+  background: none;
+  border: 1px solid #5a4a30;
+  border-radius: 2px;
+  padding: 7px 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.menu-btn:hover { border-color: #c8b88a; }
+.menu-btn span {
+  display: block; width: 18px; height: 2px; background: #c8b88a;
+  transition: transform 0.22s ease, opacity 0.22s ease;
+  border-radius: 1px;
+}
+.menu-btn.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.menu-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.menu-btn.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+/* drawer overlay */
+.mobile-menu {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+.mobile-menu.open {
+  pointer-events: all;
+  opacity: 1;
+}
+.menu-overlay {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.6);
+  cursor: pointer;
+}
+.menu-drawer {
+  position: absolute; top: 0; right: 0;
+  width: min(300px, 85vw); height: 100%;
+  background: #1a1610; border-left: 2px solid #5a4a30;
+  display: flex; flex-direction: column; overflow: hidden;
+  transform: translateX(100%);
+  transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+.mobile-menu.open .menu-drawer { transform: translateX(0); }
+.menu-drawer-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px; border-bottom: 1px solid #3a3020; flex-shrink: 0;
+}
+.menu-drawer-title { font-family: var(--type); color: #e8c870; font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; }
+.menu-close { background: none; border: none; color: #9a8a6a; font-size: 1.4rem; cursor: pointer; padding: 2px 8px; line-height: 1; }
+.menu-close:hover { color: #c8b88a; }
+.menu-drawer-body { overflow-y: auto; flex: 1; padding: 8px 0 32px; }
+.menu-drawer-body::-webkit-scrollbar { width: 3px; }
+.menu-drawer-body::-webkit-scrollbar-thumb { background: #3a3020; }
+.menu-section-label { font-family: var(--mono); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.14em; color: #5a4a30; padding: 16px 18px 5px; display: block; }
+.menu-drawer-body a {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 10px 18px; text-decoration: none;
+  font-family: var(--mono); font-size: 0.8rem; color: #7a6a50;
+  border-left: 2px solid transparent; transition: all 0.12s; line-height: 1.3;
+}
+.menu-drawer-body a:hover, .menu-drawer-body a.menu-active { color: #c8b88a; border-left-color: #8b1a1a; background: rgba(200,184,138,0.05); }
+.menu-drawer-body a .ch-num { font-size: 0.62rem; color: #5a4a30; min-width: 24px; flex-shrink: 0; }
+
+/* ── LAYOUT ── */
+.book-wrap {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 36px 20px 60px;
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  position: sticky;
+  top: 64px;
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: #5a4a30; border-radius: 2px; }
+
+.toc-card {
+  background: #1e1a14;
+  border: 1px solid #3a3020;
+  border-top: 3px solid #8b1a1a;
+  padding: 18px 16px;
+  border-radius: 2px;
+}
+.toc-title {
+  font-family: var(--type);
+  color: #c8b88a;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #3a3020;
+}
+.toc-list { list-style: none; }
+.toc-list li { margin: 2px 0; }
+.toc-list a {
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: #7a6a50;
+  text-decoration: none;
+  padding: 4px 6px;
+  border-left: 2px solid transparent;
+  line-height: 1.4;
+  transition: all 0.12s;
+}
+.toc-list a:hover {
+  color: #c8b88a;
+  border-left-color: #8b1a1a;
+  background: rgba(200,184,138,0.05);
+}
+.toc-list .toc-section {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #5a4a30;
+  margin-top: 12px;
+  margin-bottom: 4px;
+  padding-left: 6px;
+}
+
+/* ── MAIN PAGE ── */
+.page-main { display: flex; flex-direction: column; gap: 0; }
+
+/* ── BOOK COVER / HERO ── */
+.book-cover {
+  background: var(--paper);
+  border: 1px solid var(--paper-shadow);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5), inset 0 0 80px rgba(0,0,0,0.04);
+  padding: 64px 72px 56px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.book-cover::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 6px;
+  background: linear-gradient(180deg, #8b1a1a, #5a1e00, #8b1a1a);
+}
+.book-cover::after {
+  content: '';
+  position: absolute;
+  left: 6px; top: 0; bottom: 0;
+  width: 18px;
+  background: linear-gradient(90deg, rgba(0,0,0,0.12), transparent);
+}
+.cover-meta {
+  font-family: var(--type);
+  font-size: 0.75rem;
+  color: var(--ink-light);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 32px;
+}
+.cover-title {
+  font-family: var(--type);
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  line-height: 1.0;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  margin-bottom: 16px;
+}
+.cover-subtitle {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.25rem;
+  color: var(--ink-mid);
+  margin-bottom: 40px;
+  line-height: 1.5;
+}
+.cover-rule {
+  width: 100%;
+  height: 1px;
+  background: var(--rule-strong);
+  margin: 28px 0;
+  position: relative;
+}
+.cover-rule::before, .cover-rule::after {
+  content: '◆';
+  position: absolute;
+  top: -7px;
+  font-size: 0.6rem;
+  color: var(--ink-mid);
+}
+.cover-rule::before { left: 0; }
+.cover-rule::after { right: 0; }
+.cover-desc {
+  font-family: var(--mono);
+  font-size: 0.92rem;
+  line-height: 1.85;
+  color: var(--ink-mid);
+  max-width: 680px;
+  column-count: 2;
+  column-gap: 32px;
+}
+.cover-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  margin-top: 40px;
+  border: 1px solid var(--rule-strong);
+}
+.cover-stat {
+  padding: 18px 16px;
+  border-right: 1px solid var(--rule-strong);
+  text-align: center;
+}
+.cover-stat:last-child { border-right: none; }
+.cover-stat .num {
+  font-family: var(--type);
+  font-size: 2rem;
+  color: var(--ink);
+  display: block;
+  line-height: 1;
+}
+.cover-stat .lbl {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--ink-light);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  display: block;
+  margin-top: 6px;
+}
+.cover-author {
+  position: absolute;
+  bottom: 24px;
+  right: 36px;
+  font-family: var(--type);
+  font-size: 0.78rem;
+  color: var(--ink-light);
+  letter-spacing: 0.06em;
+  text-align: right;
+}
+
+/* ── CHAPTER PAGE ── */
+.chapter {
+  background: var(--paper);
+  border: 1px solid var(--paper-shadow);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.35), inset 0 0 60px rgba(0,0,0,0.02);
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.chapter::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 6px;
+  background: linear-gradient(180deg, #1a3a6b, #0a2040, #1a3a6b);
+}
+.chapter-body {
+  padding: 42px 54px 48px 60px;
+}
+
+/* chapter header */
+.ch-number {
+  font-family: var(--type);
+  font-size: 0.7rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.ch-title {
+  font-family: var(--type);
+  font-size: clamp(1.4rem, 2.8vw, 2.2rem);
+  color: var(--ink);
+  line-height: 1.1;
+  margin-bottom: 10px;
+  letter-spacing: -0.01em;
+}
+.ch-subtitle {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--ink-mid);
+  margin-bottom: 0;
+  line-height: 1.5;
+}
+.ch-header-rule {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, var(--rule-strong), transparent);
+  margin: 22px 0 28px;
+}
+
+/* chapter topics bar */
+.ch-topics {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+.ch-topic {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--blue-ink);
+  border: 1px solid rgba(26,58,107,0.3);
+  padding: 3px 9px;
+  letter-spacing: 0.06em;
+  background: rgba(26,58,107,0.04);
+}
+
+/* prose */
+.prose p {
+  font-family: var(--mono);
+  font-size: 0.91rem;
+  line-height: 1.92;
+  color: var(--ink-mid);
+  margin-bottom: 16px;
+  text-indent: 2em;
+}
+.prose p:first-child { text-indent: 0; }
+.prose h4 {
+  font-family: var(--type);
+  font-size: 1rem;
+  color: var(--ink);
+  margin: 28px 0 10px;
+  letter-spacing: 0.02em;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 5px;
+}
+.prose ul, .prose ol {
+  font-family: var(--mono);
+  font-size: 0.89rem;
+  line-height: 1.88;
+  color: var(--ink-mid);
+  padding-left: 28px;
+  margin-bottom: 16px;
+}
+.prose li { margin-bottom: 4px; }
+.prose strong { color: var(--ink); font-weight: 700; }
+
+/* callouts */
+.callout {
+  border-left: 3px solid var(--ink-mid);
+  margin: 22px 0;
+  padding: 14px 20px;
+  background: rgba(26,22,16,0.04);
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: var(--ink-mid);
+}
+.callout-warn {
+  border-left-color: var(--red-ink);
+  background: rgba(139,26,26,0.05);
+  color: #4a1010;
+}
+.callout-note {
+  border-left-color: var(--blue-ink);
+  background: rgba(26,58,107,0.04);
+  color: #1a2a4a;
+}
+.callout-label {
+  font-family: var(--type);
+  font-style: normal;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* formula/code */
+.formula {
+  font-family: var(--mono);
+  font-size: 0.88rem;
+  background: rgba(26,22,16,0.06);
+  border: 1px solid var(--rule);
+  border-top: 2px solid var(--ink-mid);
+  padding: 14px 18px;
+  margin: 18px 0;
+  color: var(--ink);
+  line-height: 1.65;
+  overflow-x: auto;
+  white-space: pre;
+}
+.formula-label {
+  font-size: 0.65rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 6px;
+  font-family: var(--mono);
+}
+
+/* tables */
+.tbl-wrap { margin: 20px 0; overflow-x: auto; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--mono);
+  font-size: 0.82rem;
+}
+table caption {
+  font-family: var(--type);
+  font-size: 0.72rem;
+  color: var(--ink-light);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: left;
+  padding-bottom: 8px;
+  margin-bottom: 4px;
+}
+thead th {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 10px 14px;
+  text-align: left;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border: 1px solid var(--ink);
+}
+tbody td {
+  padding: 9px 14px;
+  border: 1px solid var(--rule-strong);
+  color: var(--ink-mid);
+  vertical-align: top;
+  line-height: 1.65;
+}
+tbody tr:nth-child(even) td { background: rgba(26,22,16,0.03); }
+tbody tr:hover td { background: rgba(26,22,16,0.06); }
+
+/* diagrams */
+.diagram-wrap {
+  margin: 24px 0;
+  padding: 20px;
+  background: rgba(26,22,16,0.03);
+  border: 1px dashed var(--rule-strong);
+  border-radius: 0;
+}
+.diagram-caption {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: center;
+  margin-top: 12px;
+}
+
+/* svg common */
+svg text { font-family: 'Courier Prime', monospace; }
+
+/* cards grid */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+.card-item {
+  border: 1px solid var(--rule-strong);
+  padding: 14px 16px;
+  background: rgba(26,22,16,0.03);
+}
+.card-item .card-head {
+  font-family: var(--type);
+  font-size: 0.78rem;
+  color: var(--ink);
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--rule);
+}
+.card-item p {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  line-height: 1.7;
+  color: var(--ink-mid);
+  margin: 0;
+  text-indent: 0 !important;
+}
+
+/* notice strip */
+.notice {
+  background: #1a3a6b;
+  color: #c8d8f0;
+  padding: 16px 54px 16px 60px;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  line-height: 1.75;
+  border-bottom: 2px solid #0a2040;
+  margin-bottom: 0;
+}
+.notice strong { color: #e8f0ff; }
+
+/* page number strip */
+.ch-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 54px 10px 60px;
+  border-top: 1px solid var(--rule);
+  background: rgba(26,22,16,0.03);
+}
+.ch-footer-left, .ch-footer-right {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.08em;
+}
+.ch-footer-center {
+  font-family: var(--type);
+  font-size: 0.7rem;
+  color: var(--ink-light);
+  letter-spacing: 0.06em;
+}
+
+/* page rule ornaments */
+.ornament {
+  text-align: center;
+  font-family: var(--mono);
+  color: var(--ink-faint);
+  font-size: 0.7rem;
+  letter-spacing: 0.4em;
+  margin: 20px 0;
+}
+
+/* two-col text */
+.two-col {
+  column-count: 2;
+  column-gap: 32px;
+  column-rule: 1px solid var(--rule);
+}
+
+/* highlighted term */
+.term {
+  font-style: italic;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* SITE FOOTER */
+.site-footer {
+  background: #1a1610;
+  border-top: 3px double #5a4a30;
+  padding: 22px 28px;
+  text-align: center;
+}
+.footer-brand {
+  font-family: var(--type);
+  color: #c8b88a;
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+.footer-brand span { color: #e8c870; }
+.footer-sub {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: #5a4a30;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* scrollbar for sidebar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #1a1610; }
+::-webkit-scrollbar-thumb { background: #3a3020; border-radius: 2px; }
+
+/* ── TABLET ── */
+@media (max-width: 960px) {
+  .book-wrap { grid-template-columns: 1fr; padding: 16px 12px 40px; gap: 16px; }
+  .sidebar { display: none; }
+  .book-cover { padding: 36px 28px 48px; }
+  .cover-desc { column-count: 1; }
+  .cover-stats { grid-template-columns: repeat(2,1fr); }
+  .chapter-body { padding: 28px 24px 32px 30px; }
+  .ch-footer { padding: 10px 24px 10px 30px; }
+  .notice { padding: 14px 24px 14px 30px; }
+  .site-nav-pills { display: none; }
+  .site-brand { font-size: 0.78rem; }
+}
+
+/* ── MOBILE ── */
+@media (max-width: 600px) {
+  /* header */
+  .site-header-inner { padding: 0 14px; justify-content: center; }
+  .site-brand { font-size: 0.72rem; letter-spacing: 0.04em; text-align: center; }
+
+  /* layout */
+  .book-wrap { padding: 10px 8px 32px; gap: 12px; }
+
+  /* cover */
+  .book-cover { padding: 28px 18px 36px 24px; }
+  .book-cover::before { width: 4px; }
+  .book-cover::after { left: 4px; width: 12px; }
+  .cover-meta { font-size: 0.62rem; letter-spacing: 0.1em; margin-bottom: 18px; }
+  .cover-title { font-size: clamp(1.8rem, 8vw, 2.6rem); margin-bottom: 10px; }
+  .cover-subtitle { font-size: 0.95rem; margin-bottom: 24px; }
+  .cover-desc { font-size: 0.82rem; line-height: 1.75; }
+  .cover-stats { grid-template-columns: repeat(2,1fr); margin-top: 24px; }
+  .cover-stat { padding: 12px 10px; }
+  .cover-stat .num { font-size: 1.5rem; }
+  .cover-stat .lbl { font-size: 0.6rem; }
+  .cover-author { position: static; text-align: left; margin-top: 20px; font-size: 0.7rem; }
+
+  /* notice */
+  .notice { padding: 12px 18px 12px 20px; font-size: 0.78rem; line-height: 1.65; }
+
+  /* chapters */
+  .chapter { margin-bottom: 12px; }
+  .chapter::before { width: 4px; }
+  .chapter-body { padding: 20px 16px 24px 20px; }
+  .ch-number { font-size: 0.62rem; margin-bottom: 6px; }
+  .ch-title { font-size: clamp(1.1rem, 5.5vw, 1.5rem); line-height: 1.15; margin-bottom: 6px; }
+  .ch-subtitle { font-size: 0.85rem; }
+  .ch-header-rule { margin: 14px 0 18px; }
+
+  /* topics */
+  .ch-topics { gap: 5px; margin-bottom: 18px; }
+  .ch-topic { font-size: 0.6rem; padding: 2px 7px; }
+
+  /* prose */
+  .prose p { font-size: 0.84rem; line-height: 1.82; margin-bottom: 12px; text-indent: 1.2em; }
+  .prose h4 { font-size: 0.88rem; margin: 20px 0 8px; }
+  .prose ul, .prose ol { font-size: 0.82rem; padding-left: 20px; }
+
+  /* callouts */
+  .callout { padding: 12px 14px; font-size: 0.84rem; line-height: 1.68; margin: 16px 0; }
+  .callout-label { font-size: 0.58rem; margin-bottom: 5px; }
+
+  /* formulas — allow horizontal scroll on small screens */
+  .formula { font-size: 0.72rem; padding: 10px 12px; line-height: 1.55; margin: 14px 0; white-space: pre; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .formula-label { font-size: 0.58rem; }
+
+  /* tables — horizontal scroll */
+  .tbl-wrap { margin: 14px -2px; border-radius: 0; }
+  table { font-size: 0.72rem; min-width: 500px; }
+  thead th { padding: 8px 10px; }
+  tbody td { padding: 7px 10px; }
+  table caption { font-size: 0.62rem; }
+
+  /* cards */
+  .cards-grid { grid-template-columns: 1fr; gap: 8px; margin: 14px 0; }
+  .card-item { padding: 12px 13px; }
+  .card-item .card-head { font-size: 0.72rem; }
+  .card-item p { font-size: 0.75rem; }
+
+  /* diagrams */
+  .diagram-wrap { padding: 12px 8px; margin: 16px 0; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .diagram-wrap svg { min-width: 340px; }
+  .diagram-caption { font-size: 0.6rem; margin-top: 8px; }
+
+  /* chapter footer */
+  .ch-footer { padding: 8px 16px 8px 20px; flex-wrap: wrap; gap: 4px; }
+  .ch-footer-left { font-size: 0.6rem; }
+  .ch-footer-center { font-size: 0.62rem; }
+  .ch-footer-right { font-size: 0.6rem; }
+
+  /* ornament */
+  .ornament { font-size: 0.62rem; }
+
+  /* footer */
+  .site-footer { padding: 16px 16px; }
+  .footer-brand { font-size: 0.78rem; }
+  .footer-sub { font-size: 0.6rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="site-header-inner">
+    <div class="site-brand"><span>Mariana BS</span> · Be Safe · Redes do Zero ao Avançado</div>
+    <nav class="site-nav-pills">
+      <a href="#intro" data-target="intro">Intro</a>
+      <a href="#c1" data-target="c1">01</a><a href="#c2" data-target="c2">02</a><a href="#c3" data-target="c3">03</a><a href="#c4" data-target="c4">04</a>
+      <a href="#c5" data-target="c5">05</a><a href="#c6" data-target="c6">06</a><a href="#c7" data-target="c7">07</a><a href="#c8" data-target="c8">08</a>
+      <a href="#c9" data-target="c9">09</a><a href="#c10" data-target="c10">10</a><a href="#c11" data-target="c11">11</a><a href="#c12" data-target="c12">12</a>
+      <a href="#c13" data-target="c13">13</a><a href="#c14" data-target="c14">14</a><a href="#c15" data-target="c15">15</a><a href="#c16" data-target="c16">16</a>
+      <a href="#c17" data-target="c17">17</a><a href="#c18" data-target="c18">18</a><a href="#c19" data-target="c19">19</a><a href="#c20" data-target="c20">20</a>
+    </nav>
+    <button class="menu-btn" id="menuBtn" aria-label="Menu de capítulos">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- MOBILE DRAWER -->
+<div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true" aria-label="Menu de capítulos">
+  <div class="menu-overlay" id="menuOverlay"></div>
+  <div class="menu-drawer">
+    <div class="menu-drawer-head">
+      <span class="menu-drawer-title">Capítulos</span>
+      <button class="menu-close" id="menuClose" aria-label="Fechar">✕</button>
+    </div>
+    <div class="menu-drawer-body">
+      <a href="#intro" data-target="intro"><span class="ch-num">—</span>Abertura</a>
+      <span class="menu-section-label">Fundamentos</span>
+      <a href="#c1" data-target="c1"><span class="ch-num">01</span>Comunicação de dados</a>
+      <a href="#c2" data-target="c2"><span class="ch-num">02</span>Camadas e encapsulamento</a>
+      <a href="#c3" data-target="c3"><span class="ch-num">03</span>Camada física</a>
+      <a href="#c4" data-target="c4"><span class="ch-num">04</span>Codificação e modulação</a>
+      <span class="menu-section-label">Enlace e LAN</span>
+      <a href="#c5" data-target="c5"><span class="ch-num">05</span>Enlace de dados</a>
+      <a href="#c6" data-target="c6"><span class="ch-num">06</span>Acesso ao meio</a>
+      <a href="#c7" data-target="c7"><span class="ch-num">07</span>Ethernet e switching</a>
+      <a href="#c8" data-target="c8"><span class="ch-num">08</span>VLANs e STP</a>
+      <span class="menu-section-label">Camada de Rede</span>
+      <a href="#c9" data-target="c9"><span class="ch-num">09</span>IP e datagramas</a>
+      <a href="#c10" data-target="c10"><span class="ch-num">10</span>Roteamento</a>
+      <a href="#c11" data-target="c11"><span class="ch-num">11</span>Endereçamento e NAT</a>
+      <span class="menu-section-label">Transporte e Desempenho</span>
+      <a href="#c12" data-target="c12"><span class="ch-num">12</span>TCP, UDP e QUIC</a>
+      <a href="#c13" data-target="c13"><span class="ch-num">13</span>Atraso e vazão</a>
+      <a href="#c14" data-target="c14"><span class="ch-num">14</span>Filas e congestionamento</a>
+      <a href="#c15" data-target="c15"><span class="ch-num">15</span>QoS</a>
+      <span class="menu-section-label">Aplicação e Segurança</span>
+      <a href="#c16" data-target="c16"><span class="ch-num">16</span>DNS, HTTP, SMTP</a>
+      <a href="#c17" data-target="c17"><span class="ch-num">17</span>Segurança de redes</a>
+      <a href="#c18" data-target="c18"><span class="ch-num">18</span>Wireless</a>
+      <a href="#c19" data-target="c19"><span class="ch-num">19</span>WAN e Cloud</a>
+      <a href="#c20" data-target="c20"><span class="ch-num">20</span>Arquitetura e troubleshooting</a>
+    </div>
+  </div>
+</div>
+
+<div class="book-wrap">
+
+  <!-- SIDEBAR TOC -->
+  <aside class="sidebar">
+    <div class="toc-card">
+      <div class="toc-title">Sumário</div>
+      <ul class="toc-list">
+        <li><a href="#intro" data-target="intro">— Abertura</a></li>
+        <li class="toc-section">Fundamentos</li>
+        <li><a href="#c1" data-target="c1">01 · Comunicação de dados</a></li>
+        <li><a href="#c2" data-target="c2">02 · Camadas e encapsulamento</a></li>
+        <li><a href="#c3" data-target="c3">03 · Camada física</a></li>
+        <li><a href="#c4" data-target="c4">04 · Codificação e modulação</a></li>
+        <li class="toc-section">Enlace e LAN</li>
+        <li><a href="#c5" data-target="c5">05 · Enlace de dados</a></li>
+        <li><a href="#c6" data-target="c6">06 · Acesso ao meio</a></li>
+        <li><a href="#c7" data-target="c7">07 · Ethernet e switching</a></li>
+        <li><a href="#c8" data-target="c8">08 · VLANs e STP</a></li>
+        <li class="toc-section">Camada de Rede</li>
+        <li><a href="#c9" data-target="c9">09 · IP e datagramas</a></li>
+        <li><a href="#c10" data-target="c10">10 · Roteamento</a></li>
+        <li><a href="#c11" data-target="c11">11 · Endereçamento e NAT</a></li>
+        <li class="toc-section">Transporte e Desempenho</li>
+        <li><a href="#c12" data-target="c12">12 · TCP, UDP, QUIC</a></li>
+        <li><a href="#c13" data-target="c13">13 · Atraso e vazão</a></li>
+        <li><a href="#c14" data-target="c14">14 · Filas e congestionamento</a></li>
+        <li><a href="#c15" data-target="c15">15 · QoS</a></li>
+        <li class="toc-section">Aplicação e Segurança</li>
+        <li><a href="#c16" data-target="c16">16 · DNS, HTTP, SMTP</a></li>
+        <li><a href="#c17" data-target="c17">17 · Segurança de redes</a></li>
+        <li><a href="#c18" data-target="c18">18 · Wireless</a></li>
+        <li><a href="#c19" data-target="c19">19 · WAN e Cloud</a></li>
+        <li><a href="#c20" data-target="c20">20 · Arquitetura e troubleshooting</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="page-main">
+
+    <!-- COVER / INTRO -->
+    <div class="book-cover" id="intro">
+      <div class="cover-meta">Redes de Computadores · Nível Universitário · Edição 2026</div>
+      <h1 class="cover-title">Redes do Zero<br>ao Avançado</h1>
+      <p class="cover-subtitle">Fundamentos, teoria, protocolo e arquitetura — do sinal até a nuvem.</p>
+      <div class="cover-rule"></div>
+      <div class="cover-desc">
+        Esta edição prioriza densidade conceitual, rigor técnico e profundidade de raciocínio.
+        O foco deixa de ser apenas "o que é" cada elemento e passa a incluir "como funciona",
+        "por que foi desenhado assim", "quais modelos ajudam a prever comportamento" e
+        "quais trade-offs surgem quando a rede sai do quadro ideal".
+        O percurso cobre fundamentos, teoria do sinal, enlace, acesso ao meio, switching, IP,
+        roteamento, endereçamento, transporte, modelos de atraso, aplicações, segurança,
+        wireless, WAN, cloud, disponibilidade e arquitetura.
+        A leitura ideal é sequencial: o entendimento nasce quando sinais, protocolos, caminhos,
+        filas, serviços e arquitetura deixam de parecer tópicos separados e passam a compor
+        um sistema único e coerente.
+      </div>
+      <div class="cover-stats">
+        <div class="cover-stat"><span class="num">20</span><span class="lbl">Capítulos</span></div>
+        <div class="cover-stat"><span class="num">7</span><span class="lbl">Camadas abordadas</span></div>
+        <div class="cover-stat"><span class="num">∞</span><span class="lbl">Trade-offs</span></div>
+        <div class="cover-stat"><span class="num">1</span><span class="lbl">Sistema coerente</span></div>
+      </div>
+      <div class="cover-author">Mariana BS · Be Safe · 2026</div>
+    </div>
+
+    <!-- NOTICE -->
+    <div class="notice" id="notice">
+      <strong>Nota de leitura:</strong> A leitura ideal desta edição é sequencial. O entendimento forte de redes nasce quando
+      sinais, protocolos, caminhos, filas, serviços e arquitetura deixam de parecer tópicos separados
+      e passam a ser vistos como partes do mesmo sistema.
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 01
+    ══════════════════════════════════════════════ -->
+    <div class="chapter" id="c1">
+      <div class="chapter-body">
+        <div class="ch-number">Capítulo 01</div>
+        <h2 class="ch-title">Fundamentos da Comunicação de Dados</h2>
+        <p class="ch-subtitle">Informação, representação, sistemas de comunicação e métricas fundamentais.</p>
+        <div class="ch-header-rule"></div>
+        <div class="ch-topics">
+          <span class="ch-topic">informação e representação</span>
+          <span class="ch-topic">origem · destino · meio · protocolo</span>
+          <span class="ch-topic">largura de banda</span>
+          <span class="ch-topic">vazão e latência</span>
+          <span class="ch-topic">jitter e perda</span>
+        </div>
+
+        <div class="prose">
+          <p>O estudo de redes começa antes do primeiro cabo, antes do primeiro endereço IP e antes de qualquer roteador. Ele começa com uma pergunta de engenharia: como transportar informação de um ponto a outro de forma que essa informação preserve utilidade, integridade operacional e temporalidade adequada ao serviço que depende dela?</p>
+
+          <p>Em termos estritos, uma rede é um <span class="term">sistema de comunicação</span>. Esse sistema existe para permitir que entidades distintas — computadores, sensores, dispositivos móveis, aplicações, máquinas industriais, servidores, serviços em nuvem — troquem dados por meio de regras compartilhadas. Quando essa troca é bem-sucedida, temos comunicação. Quando não é, temos apenas atividade elétrica, óptica ou eletromagnética sem valor prático.</p>
+
+          <p>A noção de <span class="term">dado</span> precisa ser separada da noção de <span class="term">significado</span>. Para humanos, uma mensagem possui semântica. Para a rede, essa mesma mensagem é representada por símbolos discretos — normalmente bits — que precisam ser organizados, transportados, entregues e interpretados por camadas superiores.</p>
+
+          <h4>Elementos de um Sistema de Comunicação</h4>
+
+          <div class="diagram-wrap">
+            <svg viewBox="0 0 700 90" xmlns="http://www.w3.org/2000/svg" width="100%" height="90">
+              <defs>
+                <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                  <path d="M0,0 L0,6 L8,3 z" fill="#1a3a6b"/>
+                </marker>
+              </defs>
+              <rect x="20" y="20" width="110" height="50" fill="none" stroke="#1a1610" stroke-width="1.5"/>
+              <text x="75" y="42" text-anchor="middle" font-size="10" fill="#1a1610" font-weight="700">ORIGEM</text>
+              <text x="75" y="57" text-anchor="middle" font-size="9" fill="#6b5f50">emissor</text>
+              <line x1="130" y1="45" x2="195" y2="45" stroke="#1a3a6b" stroke-width="1.5" marker-end="url(#arr)"/>
+              <rect x="198" y="20" width="110" height="50" fill="none" stroke="#1a1610" stroke-width="1.5"/>
+              <text x="253" y="42" text-anchor="middle" font-size="10" fill="#1a1610" font-weight="700">MEIO</text>
+              <text x="253" y="57" text-anchor="middle" font-size="9" fill="#6b5f50">canal físico/lógico</text>
+              <line x1="308" y1="45" x2="373" y2="45" stroke="#1a3a6b" stroke-width="1.5" marker-end="url(#arr)"/>
+              <rect x="376" y="20" width="110" height="50" fill="none" stroke="#1a1610" stroke-width="1.5"/>
+              <text x="431" y="42" text-anchor="middle" font-size="10" fill="#1a1610" font-weight="700">DESTINO</text>
+              <text x="431" y="57" text-anchor="middle" font-size="9" fill="#6b5f50">receptor</text>
+              <text x="162" y="36" text-anchor="middle" font-size="8" fill="#8b1a1a">protocolo</text>
+              <text x="340" y="36" text-anchor="middle" font-size="8" fill="#8b1a1a">protocolo</text>
+            </svg>
+            <div class="diagram-caption">Fig. 1.1 — Componentes fundamentais de um sistema de comunicação</div>
+          </div>
+
+          <h4>Métricas Essenciais</h4>
+        </div>
+
+        <div class="tbl-wrap">
+          <table>
+            <caption>Tabela 1.1 — Métricas fundamentais de desempenho de redes</caption>
+            <thead>
+              <tr><th>Métrica</th><th>Definição Formal</th><th>Unidade Típica</th><th>Implicação Operacional</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Largura de banda</strong></td><td>Capacidade nominal de transmissão do enlace ou canal</td><td>bps / Mbps / Gbps</td><td>Define o teto bruto de tráfego transportável</td></tr>
+              <tr><td><strong>Vazão (throughput)</strong></td><td>Taxa real de dados efetivamente transferidos</td><td>Mbps observados</td><td>Mostra o desempenho observado em uso</td></tr>
+              <tr><td><strong>Goodput</strong></td><td>Taxa de dados úteis entregues à aplicação</td><td>Mbps úteis</td><td>Remove overhead, retransmissão e sinalização do cálculo de utilidade</td></tr>
+              <tr><td><strong>Latência</strong></td><td>Tempo de travessia ponta-a-ponta de um datagrama</td><td>ms / µs</td><td>Afeta interatividade, sincronização e experiência de uso</td></tr>
+              <tr><td><strong>Jitter</strong></td><td>Variação temporal da latência entre pacotes sucessivos</td><td>ms</td><td>Crítico para voz, vídeo e fluxos sensíveis a tempo</td></tr>
+              <tr><td><strong>Perda de pacote</strong></td><td>Porcentagem de datagramas não entregues corretamente</td><td>%</td><td>Impõe retransmissão, degradação de qualidade ou quebra de sessão</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-note">
+          <span class="callout-label">Nota Técnica</span>
+          Uma armadilha comum em ambientes operacionais é chamar qualquer problema de "lentidão". Em linguagem técnica, a rede pode estar sofrendo de atraso elevado, contenção, perda, MTU inadequada, fila excessiva, resolução de nomes lenta, retransmissão ou saturação de CPU em dispositivos intermediários. O vocabulário técnico importa porque muda a qualidade do diagnóstico.
+        </div>
+
+        <div class="callout">
+          <span class="callout-label">Princípio Fundamental</span>
+          Rede é, no fundo, uma tentativa disciplinada de impor ordem sobre a imperfeição do mundo físico e sobre a concorrência inevitável entre múltiplos emissores.
+        </div>
+      </div>
+      <div class="ch-footer">
+        <span class="ch-footer-left">Redes do Zero ao Avançado</span>
+        <span class="ch-footer-center">◆ ◆ ◆</span>
+        <span class="ch-footer-right">Capítulo 01 · Fundamentos · Mariana BS</span>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 02
+    ══════════════════════════════════════════════ -->
+    <div class="chapter" id="c2">
+      <div class="chapter-body">
+        <div class="ch-number">Capítulo 02</div>
+        <h2 class="ch-title">Camadas, Serviços, Interfaces e Encapsulamento</h2>
+        <p class="ch-subtitle">Por que dividir em camadas e como essa divisão organiza a complexidade.</p>
+        <div class="ch-header-rule"></div>
+        <div class="ch-topics">
+          <span class="ch-topic">modelos de referência</span>
+          <span class="ch-topic">OSI e TCP/IP</span>
+          <span class="ch-topic">serviços e interfaces</span>
+          <span class="ch-topic">encapsulamento</span>
+          <span class="ch-topic">PDU por camada</span>
+        </div>
+
+        <div class="prose">
+          <p>A arquitetura em camadas é uma decisão de engenharia, não um capricho acadêmico. Ela permite que problemas distintos sejam tratados por equipes distintas, que implementações sejam substituídas sem afetar o restante do sistema, e que o mesmo protocolo superior funcione sobre meios físicos completamente diferentes.</p>
+
+          <h4>Modelo OSI — 7 Camadas</h4>
+        </div>
+
+        <div class="diagram-wrap">
+          <svg viewBox="0 0 680 320" xmlns="http://www.w3.org/2000/svg" width="100%" height="320">
+            <!-- OSI Stack sender -->
+            <text x="140" y="20" text-anchor="middle" font-size="10" font-weight="700" fill="#1a1610" font-family="'Courier Prime', monospace">EMISSOR</text>
+            <rect x="20" y="30" width="240" height="36" fill="#1a1610" stroke="none"/>
+            <text x="140" y="52" text-anchor="middle" font-size="10" fill="#f5f0e8" font-family="'Courier Prime', monospace" font-weight="700">7 · Aplicação</text>
+            <rect x="20" y="68" width="240" height="36" fill="#2a2820" stroke="#1a1610" stroke-width="1"/>
+            <text x="140" y="90" text-anchor="middle" font-size="10" fill="#c8b88a" font-family="'Courier Prime', monospace">6 · Apresentação</text>
+            <rect x="20" y="106" width="240" height="36" fill="#1a1610" stroke="none"/>
+            <text x="140" y="128" text-anchor="middle" font-size="10" fill="#f5f0e8" font-family="'Courier Prime', monospace">5 · Sessão</text>
+            <rect x="20" y="144" width="240" height="36" fill="#1a3a6b" stroke="none"/>
+            <text x="140" y="166" text-anchor="middle" font-size="10" fill="#f5f0e8" font-family="'Courier Prime', monospace" font-weight="700">4 · Transporte</text>
+            <rect x="20" y="182" width="240" height="36" fill="#8b1a1a" stroke="none"/>
+            <text x="140" y="204" text-anchor="middle" font-size="10" fill="#f5f0e8" font-family="'Courier Prime', monospace" font-weight="700">3 · Rede</text>
+            <rect x="20" y="220" width="240" height="36" fill="#1a4a2a" stroke="none"/>
+            <text x="140" y="242" text-anchor="middle" font-size="10" fill="#f5f0e8" font-family="'Courier Prime', monospace">2 · Enlace</text>
+            <rect x="20" y="258" width="240" height="36" fill="#4a3000" stroke="none"/>
+            <text x="140" y="280" text-anchor="middle" font-size="10" fill="#f5f0e8" font-family="'Courier Prime', monospace">1 · Física</text>
+            <!-- PDU labels -->
+            <text x="270" y="52" font-size="9" fill="#6b5f50" font-family="'Courier Prime', monospace">Mensagem</text>
+            <text x="270" y="90" font-size="9" fill="#6b5f50" font-family="'Courier Prime', monospace">→ Mensagem</text>
+            <text x="270" y="128" font-size="9" fill="#6b5f50" font-family="'Courier Prime', monospace">→ Mensagem</text>
+            <text x="270" y="166" font-size="9" fill="#6b5f50" font-family="'Courier Prime', monospace">Segmento</text>
+            <text x="270" y="204" font-size="9" fill="#6b5f50" font-family="'Courier Prime', monospace">Datagrama</text>
+            <text x="270" y="242" font-size="9" fill="#6b5f50" font-family="'Courier Prime', monospace">Quadro</text>
+            <text x="270" y="280" font-size="9" fill="#6b5f50" font-family="'Courier Prime', monospace">Bit</text>
+            <!-- meio -->
+            <line x1="360" y1="276" x2="420" y2="276" stroke="#4a3000" stroke-width="4"/>
+            <text x="390" y="295" text-anchor="middle" font-size="9" fill="#6b5f50" font-family="'Courier Prime', monospace">meio físico</text>
+            <!-- Receptor -->
+            <text x="540" y="20" text-anchor="middle" font-size="10" font-weight="700" fill="#1a1610" font-family="'Courier Prime', monospace">RECEPTOR</text>
+            <rect x="420" y="30" width="240" height="36" fill="#1a1610" stroke="none"/>
+            <text x="540" y="52" text-anchor="middle" font-size="10" fill="#f5f0e8" font-family="'Courier Prime', monospace" font-weight="700">7 · Aplicação</text>
+            <rect x="420" y="68" width="240" height="36" fill="#2a2820" stroke="#1a1610" stroke-width="1"/>
+            <text x="540" y="90" text-anchor="middle" font-size="10" fill="#c8b88a" font-family="'Courier Prime', monospace">6 · Apresentação</text>
+            <rect x="420" y="106" width="240" height="36" fill="#1a1610" stroke="none"/>
+            <text x="540" y="128" text-anchor="middle" font-size="10" fill="#f5f0e8" font-family="'Courier Prime', monospace">5 · Sessão</text>
+            <rect x="420" y="144" width="240" height="36" fill="#1a3a6b" stroke="none"/>
+            <text x="540" y="166" text-anchor="middle" font-size="10" fill="#f5f0e8" font-family="'Courier Prime', monospace" font-weight="700">4 · Transporte</text>
+            <rect x="420" y="182" width="240" height="36" fill="#8b1a1a" stroke="none"/>
+            <text x="540" y="204" text-anchor="middle" font-size="10" fill="#f5f0e8" font-family="'Courier Prime', monospace" font-weight="700">3 · Rede</text>
+            <rect x="420" y="220" width="240" height="36" fill="#1a4a2a" stroke="none"/>
+            <text x="540" y="242" text-anchor="middle" font-size="10" fill="#f5f0e8" font-family="'Courier Prime', monospace">2 · Enlace</text>
+            <rect x="420" y="258" width="240" height="36" fill="#4a3000" stroke="none"/>
+            <text x="540" y="280" text-anchor="middle" font-size="10" fill="#f5f0e8" font-family="'Courier Prime', monospace">1 · Física</text>
+            <!-- arrows between stacks -->
+            <path d="M260 48 Q330 48 420 48" fill="none" stroke="#c8b88a" stroke-width="1" stroke-dasharray="4,3"/>
+            <path d="M260 162 Q330 162 420 162" fill="none" stroke="#c8b88a" stroke-width="1" stroke-dasharray="4,3"/>
+            <path d="M260 200 Q330 200 420 200" fill="none" stroke="#c8b88a" stroke-width="1" stroke-dasharray="4,3"/>
+            <text x="340" y="46" text-anchor="middle" font-size="8" fill="#9a8f80" font-family="'Courier Prime', monospace">peer</text>
+            <text x="340" y="160" text-anchor="middle" font-size="8" fill="#9a8f80" font-family="'Courier Prime', monospace">peer</text>
+            <text x="340" y="198" text-anchor="middle" font-size="8" fill="#9a8f80" font-family="'Courier Prime', monospace">peer</text>
+          </svg>
+          <div class="diagram-caption">Fig. 2.1 — Modelo OSI: camadas, PDUs e comunicação peer-to-peer lógica</div>
+        </div>
+
+        <div class="prose">
+          <h4>TCP/IP vs OSI — Diferenças Práticas</h4>
+        </div>
+
+        <div class="tbl-wrap">
+          <table>
+            <caption>Tabela 2.1 — Comparação entre modelo OSI e modelo TCP/IP</caption>
+            <thead>
+              <tr><th>Aspecto</th><th>Modelo OSI</th><th>Modelo TCP/IP</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Número de camadas</td><td>7 camadas</td><td>4 camadas (Internet, Link, Transporte, Aplicação)</td></tr>
+              <tr><td>Origem</td><td>ISO — modelo teórico-normativo</td><td>DARPA — modelo pragmático operacional</td></tr>
+              <tr><td>Adoção</td><td>Referência conceitual universal</td><td>Adotado na internet real</td></tr>
+              <tr><td>Camadas de apresentação e sessão</td><td>Explícitas</td><td>Absorvidas na camada de Aplicação</td></tr>
+              <tr><td>Uso em diagnóstico</td><td>Estrutura de raciocínio por camada</td><td>Implementação de protocolos reais</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="prose">
+          <h4>Encapsulamento</h4>
+          <p>Cada camada envolve os dados recebidos da camada superior com um <span class="term">cabeçalho</span> (e às vezes um <span class="term">trailer</span>) próprio. Esse processo — encapsulamento — permite que a camada inferior trate o conteúdo superior como payload opaco. No receptor, o processo inverte-se: cada camada remove seu cabeçalho e entrega o conteúdo restante à camada imediatamente superior.</p>
+        </div>
+
+        <div class="diagram-wrap">
+          <svg viewBox="0 0 680 120" xmlns="http://www.w3.org/2000/svg" width="100%" height="120">
+            <!-- Encapsulation diagram -->
+            <text x="340" y="16" text-anchor="middle" font-size="9" fill="#6b5f50" font-family="'Courier Prime', monospace">Processo de Encapsulamento — do dado bruto ao quadro físico</text>
+            <!-- Camada 7 -->
+            <rect x="260" y="25" width="160" height="22" fill="#1a1610"/>
+            <text x="340" y="40" text-anchor="middle" font-size="9" fill="#f5f0e8" font-family="'Courier Prime', monospace">DADO</text>
+            <!-- Camada 4 -->
+            <rect x="220" y="50" width="40" height="22" fill="#1a3a6b"/>
+            <text x="240" y="65" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace">TCP</text>
+            <rect x="260" y="50" width="160" height="22" fill="#1a1610"/>
+            <text x="340" y="65" text-anchor="middle" font-size="9" fill="#f5f0e8" font-family="'Courier Prime', monospace">DADO</text>
+            <!-- Camada 3 -->
+            <rect x="180" y="75" width="40" height="22" fill="#8b1a1a"/>
+            <text x="200" y="90" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace">IP</text>
+            <rect x="220" y="75" width="40" height="22" fill="#1a3a6b"/>
+            <text x="240" y="90" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace">TCP</text>
+            <rect x="260" y="75" width="160" height="22" fill="#1a1610"/>
+            <text x="340" y="90" text-anchor="middle" font-size="9" fill="#f5f0e8" font-family="'Courier Prime', monospace">DADO</text>
+            <!-- Camada 2 -->
+            <rect x="140" y="100" width="40" height="18" fill="#1a4a2a"/>
+            <text x="160" y="113" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace">ETH</text>
+            <rect x="180" y="100" width="40" height="18" fill="#8b1a1a"/>
+            <text x="200" y="113" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace">IP</text>
+            <rect x="220" y="100" width="40" height="18" fill="#1a3a6b"/>
+            <text x="240" y="113" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace">TCP</text>
+            <rect x="260" y="100" width="160" height="18" fill="#1a1610"/>
+            <text x="340" y="113" text-anchor="middle" font-size="9" fill="#f5f0e8" font-family="'Courier Prime', monospace">DADO</text>
+            <rect x="420" y="100" width="36" height="18" fill="#4a3000"/>
+            <text x="438" y="113" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace">FCS</text>
+            <!-- label -->
+            <text x="100" y="40" text-anchor="middle" font-size="8" fill="#8b1a1a" font-family="'Courier Prime', monospace">L7</text>
+            <text x="100" y="65" text-anchor="middle" font-size="8" fill="#1a3a6b" font-family="'Courier Prime', monospace">L4</text>
+            <text x="100" y="90" text-anchor="middle" font-size="8" fill="#8b1a1a" font-family="'Courier Prime', monospace">L3</text>
+            <text x="100" y="113" text-anchor="middle" font-size="8" fill="#1a4a2a" font-family="'Courier Prime', monospace">L2</text>
+          </svg>
+          <div class="diagram-caption">Fig. 2.2 — Encapsulamento progressivo: cada camada adiciona seu cabeçalho</div>
+        </div>
+
+        <div class="callout">
+          <span class="callout-label">Princípio de Projeto</span>
+          Uma camada não precisa — e não deve — inspecionar o conteúdo das camadas adjacentes. Essa opacidade é o que permite substituir TCP por QUIC, Ethernet por Wi-Fi, ou IPv4 por IPv6 sem reescrever toda a pilha.
+        </div>
+      </div>
+      <div class="ch-footer">
+        <span class="ch-footer-left">Redes do Zero ao Avançado</span>
+        <span class="ch-footer-center">◆ ◆ ◆</span>
+        <span class="ch-footer-right">Capítulo 02 · Camadas · Mariana BS</span>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 03
+    ══════════════════════════════════════════════ -->
+    <div class="chapter" id="c3">
+      <div class="chapter-body">
+        <div class="ch-number">Capítulo 03</div>
+        <h2 class="ch-title">Camada Física: Sinais, Meios e Limites da Realidade</h2>
+        <p class="ch-subtitle">A base física sobre a qual toda comunicação é construída.</p>
+        <div class="ch-header-rule"></div>
+        <div class="ch-topics">
+          <span class="ch-topic">sinais analógicos e digitais</span>
+          <span class="ch-topic">Nyquist e Shannon</span>
+          <span class="ch-topic">guiados vs não-guiados</span>
+          <span class="ch-topic">fibra óptica</span>
+          <span class="ch-topic">ruído e atenuação</span>
+        </div>
+
+        <div class="prose">
+          <p>A camada física é onde bits se tornam sinais. Ela define quais formas físicas transportam energia ou luz representando zeros e uns, como esses sinais se propagam, quais distorções sofrem e quais limites teóricos existem para a taxa de transmissão.</p>
+
+          <h4>Teorema de Nyquist</h4>
+          <p>O teorema de Nyquist estabelece que um canal analógico de largura de banda B pode transportar no máximo 2B símbolos por segundo sem interferência intersimbólica. Se cada símbolo pode assumir V níveis distintos, a taxa máxima de dados é:</p>
+        </div>
+
+        <div class="formula">
+          <span class="formula-label">Fórmula 3.1 — Nyquist (canal sem ruído)</span>
+C_max = 2B · log₂(V)     [bps]
+
+Onde:  B = largura de banda do canal  [Hz]
+       V = número de níveis de sinal discretos</div>
+
+        <div class="prose">
+          <h4>Teorema de Shannon</h4>
+          <p>Shannon generalizou o problema para canais com ruído. A <span class="term">capacidade de canal de Shannon</span> é o limite absoluto teórico para transmissão confiável, independentemente do esquema de codificação utilizado:</p>
+        </div>
+
+        <div class="formula">
+          <span class="formula-label">Fórmula 3.2 — Shannon-Hartley (canal com ruído)</span>
+C = B · log₂(1 + S/N)    [bps]
+
+Onde:  B   = largura de banda  [Hz]
+       S/N = relação sinal-ruído (linear, não em dB)
+
+Conversão:  S/N (linear) = 10^(SNR_dB / 10)</div>
+
+        <div class="prose">
+          <h4>Meios de Transmissão</h4>
+        </div>
+
+        <div class="tbl-wrap">
+          <table>
+            <caption>Tabela 3.1 — Comparação entre meios de transmissão guiados</caption>
+            <thead>
+              <tr><th>Meio</th><th>Velocidade Típica</th><th>Distância Máx.</th><th>Interferência</th><th>Custo Rel.</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Par trançado (UTP Cat6)</strong></td><td>1 Gbps</td><td>100 m</td><td>Moderada (EMI)</td><td>Baixo</td></tr>
+              <tr><td><strong>Par trançado (Cat6A)</strong></td><td>10 Gbps</td><td>100 m</td><td>Reduzida</td><td>Moderado</td></tr>
+              <tr><td><strong>Coaxial</strong></td><td>10 Gbps+</td><td>500 m</td><td>Baixa (blindagem)</td><td>Moderado</td></tr>
+              <tr><td><strong>Fibra monomodo</strong></td><td>100 Gbps+</td><td>80 km+ por span</td><td>Imune a EMI</td><td>Alto</td></tr>
+              <tr><td><strong>Fibra multimodo</strong></td><td>10–100 Gbps</td><td>300–2000 m</td><td>Imune a EMI</td><td>Médio-alto</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="diagram-wrap">
+          <svg viewBox="0 0 680 160" xmlns="http://www.w3.org/2000/svg" width="100%" height="160">
+            <!-- Signal quality degradation diagram -->
+            <text x="340" y="16" text-anchor="middle" font-size="9" fill="#6b5f50" font-family="'Courier Prime', monospace">Efeito da atenuação e ruído sobre a forma de onda digital</text>
+            <!-- ideal signal -->
+            <text x="100" y="42" text-anchor="middle" font-size="9" fill="#1a1610" font-family="'Courier Prime', monospace" font-weight="700">Sinal Ideal</text>
+            <polyline points="20,70 20,50 60,50 60,80 100,80 100,50 140,50 140,80 180,80 180,50 200,50" fill="none" stroke="#1a1610" stroke-width="2"/>
+            <line x1="20" y1="65" x2="200" y2="65" stroke="#9a8f80" stroke-width="0.5" stroke-dasharray="3,3"/>
+            <!-- attenuated/noisy signal -->
+            <text x="450" y="42" text-anchor="middle" font-size="9" fill="#8b1a1a" font-family="'Courier Prime', monospace" font-weight="700">Com Atenuação + Ruído</text>
+            <path d="M260,68 C275,52 285,62 300,55 C310,50 320,48 340,56 C355,62 360,78 380,76 C395,74 410,52 430,55 C445,58 450,72 470,68 C485,65 495,51 510,54 C520,56 530,60 540,62" fill="none" stroke="#8b1a1a" stroke-width="1.5"/>
+            <line x1="260" y1="65" x2="540" y2="65" stroke="#9a8f80" stroke-width="0.5" stroke-dasharray="3,3"/>
+            <!-- arrow -->
+            <line x1="210" y1="65" x2="250" y2="65" stroke="#9a8f80" stroke-width="1" stroke-dasharray="4,3"/>
+            <text x="230" y="58" text-anchor="middle" font-size="8" fill="#9a8f80" font-family="'Courier Prime', monospace">canal</text>
+            <!-- labels -->
+            <text x="100" y="110" text-anchor="middle" font-size="8" fill="#6b5f50" font-family="'Courier Prime', monospace">nível alto = 1</text>
+            <text x="100" y="122" text-anchor="middle" font-size="8" fill="#6b5f50" font-family="'Courier Prime', monospace">nível baixo = 0</text>
+            <text x="400" y="110" text-anchor="middle" font-size="8" fill="#8b1a1a" font-family="'Courier Prime', monospace">discriminação de nível</text>
+            <text x="400" y="122" text-anchor="middle" font-size="8" fill="#8b1a1a" font-family="'Courier Prime', monospace">torna-se difícil com ruído</text>
+          </svg>
+          <div class="diagram-caption">Fig. 3.1 — Degradação de sinal: atenuação e ruído comprometem a discriminação de símbolo</div>
+        </div>
+
+        <div class="callout callout-warn">
+          <span class="callout-label">Atenção de Engenharia</span>
+          É por isso que distância, ruído e escolha de meio não são detalhes periféricos. Eles fazem parte do cerne da qualidade de comunicação. O limite de Shannon é absoluto e não pode ser contornado por nenhum esquema de codificação, independentemente de sua sofisticação.
+        </div>
+      </div>
+      <div class="ch-footer">
+        <span class="ch-footer-left">Redes do Zero ao Avançado</span>
+        <span class="ch-footer-center">◆ ◆ ◆</span>
+        <span class="ch-footer-right">Capítulo 03 · Física · Mariana BS</span>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 04
+    ══════════════════════════════════════════════ -->
+    <div class="chapter" id="c4">
+      <div class="chapter-body">
+        <div class="ch-number">Capítulo 04</div>
+        <h2 class="ch-title">Codificação, Modulação, Sincronismo e Multiplexação</h2>
+        <p class="ch-subtitle">Como transformar fluxo binário em transmissão viável e eficiente.</p>
+        <div class="ch-header-rule"></div>
+        <div class="ch-topics">
+          <span class="ch-topic">NRZ · Manchester · 4B/5B</span>
+          <span class="ch-topic">AM · FM · PM · QAM</span>
+          <span class="ch-topic">TDM · FDM · WDM · CDM</span>
+          <span class="ch-topic">sincronismo de clock</span>
+        </div>
+
+        <div class="prose">
+          <p>Uma vez que a informação precisa virar sinal, surgem duas perguntas práticas: como representar 0 e 1 de modo confiável? E como garantir que o receptor reconheça corretamente a fronteira entre símbolos sucessivos? A resposta passa por codificação, modulação e sincronismo.</p>
+
+          <h4>Técnicas de Codificação de Linha</h4>
+        </div>
+
+        <div class="tbl-wrap">
+          <table>
+            <caption>Tabela 4.1 — Principais técnicas de codificação de linha</caption>
+            <thead>
+              <tr><th>Técnica</th><th>Princípio</th><th>Recuperação de Clock</th><th>Eficiência Espectral</th><th>Aplicação Típica</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>NRZ-L</strong></td><td>Nível alto = 1, baixo = 0</td><td>Ruim (sem transições em sequências longas)</td><td>Alta</td><td>Comunicação serial básica</td></tr>
+              <tr><td><strong>NRZ-I</strong></td><td>Inversão no 1, estável no 0</td><td>Melhor para sequências de 1s</td><td>Alta</td><td>USB, NRZI serial</td></tr>
+              <tr><td><strong>Manchester</strong></td><td>Transição no centro de cada bit</td><td>Excelente</td><td>50% (dobra BW necessária)</td><td>Ethernet 10BASE-T legacy</td></tr>
+              <tr><td><strong>4B/5B</strong></td><td>Mapeia 4 bits em 5 bits sem sequências longas de 0</td><td>Boa</td><td>80%</td><td>FDDI, Fast Ethernet</td></tr>
+              <tr><td><strong>8B/10B</strong></td><td>8 bits → 10 bits com DC balance</td><td>Excelente</td><td>80%</td><td>Gigabit Ethernet, Fibre Channel</td></tr>
+              <tr><td><strong>PAM-4</strong></td><td>4 níveis de amplitude (2 bits/símbolo)</td><td>Requer DSP</td><td>Muito alta</td><td>400GbE, 800GbE, links modernos</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="prose">
+          <h4>Multiplexação — Compartilhamento do Meio</h4>
+        </div>
+
+        <div class="cards-grid">
+          <div class="card-item">
+            <div class="card-head">TDM — Divisão no Tempo</div>
+            <p>Cada emissor recebe slots de tempo fixos e alternados. Largamente usado em telecomunicações clássicas (T1, E1). A alocação é estática, mesmo se o emissor não tiver dados.</p>
+          </div>
+          <div class="card-item">
+            <div class="card-head">FDM — Divisão em Frequência</div>
+            <p>Emissores distintos ocupam sub-bandas de frequência distintas e não sobrepostas. Fundamento de rádio AM/FM, TV analógica e OFDM moderno.</p>
+          </div>
+          <div class="card-item">
+            <div class="card-head">WDM — Divisão em Comprimento de Onda</div>
+            <p>Múltiplos lasers em comprimentos de onda diferentes compartilham a mesma fibra. DWDM suporta 80+ canais por fibra, habilitando capacidades de Tbps.</p>
+          </div>
+          <div class="card-item">
+            <div class="card-head">CDM — Divisão por Código</div>
+            <p>Emissores transmitem simultaneamente na mesma frequência usando sequências ortogonais únicas. Base do CDMA, GPS e LTE (em forma de OFDM-CDM).</p>
+          </div>
+        </div>
+
+        <div class="callout">
+          <span class="callout-label">Princípio Fundamental</span>
+          A camada física não se resume a "tem ou não tem link". Ela define quão estável, eficiente e escalável será a própria base da rede. Um engenheiro que ignora a física tende a diagnosticar mal problemas que se manifestam nas camadas superiores.
+        </div>
+      </div>
+      <div class="ch-footer">
+        <span class="ch-footer-left">Redes do Zero ao Avançado</span>
+        <span class="ch-footer-center">◆ ◆ ◆</span>
+        <span class="ch-footer-right">Capítulo 04 · Codificação · Mariana BS</span>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 05
+    ══════════════════════════════════════════════ -->
+    <div class="chapter" id="c5">
+      <div class="chapter-body">
+        <div class="ch-number">Capítulo 05</div>
+        <h2 class="ch-title">Enlace de Dados: Framing, Erro, Fluxo e Disciplina Local</h2>
+        <p class="ch-subtitle">Como organizar comunicação confiável entre nós vizinhos.</p>
+        <div class="ch-header-rule"></div>
+        <div class="ch-topics">
+          <span class="ch-topic">framing e delimitação</span>
+          <span class="ch-topic">CRC e detecção de erro</span>
+          <span class="ch-topic">Stop-and-Wait</span>
+          <span class="ch-topic">janelas deslizantes</span>
+          <span class="ch-topic">Go-Back-N · SR</span>
+        </div>
+
+        <div class="prose">
+          <p>A camada de enlace pega um meio físico imperfeito e tenta oferecer uma forma mais organizada de comunicação entre nós vizinhos. Para isso, ela precisa delimitar unidades de transmissão, identificar destinatários locais, detectar erros, controlar ritmo e, em mídias compartilhadas, arbitrar quem pode falar.</p>
+
+          <h4>CRC — Cyclic Redundancy Check</h4>
+          <p>O CRC é o mecanismo dominante de detecção de erro em enlace. Trata o quadro como um polinômio e divide-o por um polinômio gerador pré-acordado. O resto dessa divisão é transmitido junto ao quadro. O receptor realiza a mesma divisão; um resto diferente de zero indica erro.</p>
+        </div>
+
+        <div class="formula">
+          <span class="formula-label">Fórmula 5.1 — Eficiência de transmissão (Stop-and-Wait)</span>
+η = 1 / (1 + 2a)    onde  a = Tp / Tt = (propagação) / (transmissão)
+
+Para janelas deslizantes (W = tamanho da janela):
+η = W / (1 + 2a)    quando  W &lt; 1 + 2a
+η = 1               quando  W ≥ 1 + 2a</div>
+
+        <div class="prose">
+          <h4>Protocolos de Janela Deslizante</h4>
+        </div>
+
+        <div class="tbl-wrap">
+          <table>
+            <caption>Tabela 5.1 — Comparação entre protocolos ARQ (Automatic Repeat reQuest)</caption>
+            <thead>
+              <tr><th>Protocolo</th><th>Janela Tx</th><th>Janela Rx</th><th>Em caso de erro</th><th>Complexidade do receptor</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Stop-and-Wait</strong></td><td>1</td><td>1</td><td>Retransmite 1 quadro</td><td>Mínima</td></tr>
+              <tr><td><strong>Go-Back-N</strong></td><td>N</td><td>1</td><td>Retransmite quadro com erro + todos seguintes</td><td>Baixa (sem buffer no receptor)</td></tr>
+              <tr><td><strong>Selective Repeat</strong></td><td>N/2</td><td>N/2</td><td>Retransmite apenas o quadro com erro</td><td>Alta (buffer no receptor necessário)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-note">
+          <span class="callout-label">Nota de Projeto</span>
+          A ideia de janelas deslizantes aparece novamente na camada de transporte, com papel ainda mais sofisticado. TCP usa um mecanismo semelhante ao Selective Repeat, mas com janela dinâmica ajustada por controle de congestionamento.
+        </div>
+      </div>
+      <div class="ch-footer">
+        <span class="ch-footer-left">Redes do Zero ao Avançado</span>
+        <span class="ch-footer-center">◆ ◆ ◆</span>
+        <span class="ch-footer-right">Capítulo 05 · Enlace · Mariana BS</span>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 06
+    ══════════════════════════════════════════════ -->
+    <div class="chapter" id="c6">
+      <div class="chapter-body">
+        <div class="ch-number">Capítulo 06</div>
+        <h2 class="ch-title">Acesso ao Meio: Colisões, Contenção e Múltiplos Emissores</h2>
+        <p class="ch-subtitle">Como vários dispositivos compartilham um mesmo meio sem destruir a utilidade do canal.</p>
+        <div class="ch-header-rule"></div>
+        <div class="ch-topics">
+          <span class="ch-topic">ALOHA puro e ALOHA com slot</span>
+          <span class="ch-topic">CSMA / CD / CA</span>
+          <span class="ch-topic">Token Ring</span>
+          <span class="ch-topic">eficiência de canal</span>
+        </div>
+
+        <div class="prose">
+          <p>Quando múltiplos dispositivos desejam transmitir pelo mesmo meio, surge um problema de concorrência. Se todos falarem ao mesmo tempo, o resultado tende a ser destrutivo. A disciplina de acesso ao meio existe para transformar competição caótica em compartilhamento utilizável.</p>
+
+          <h4>Evolução Histórica dos Protocolos MAC</h4>
+        </div>
+
+        <div class="diagram-wrap">
+          <svg viewBox="0 0 680 130" xmlns="http://www.w3.org/2000/svg" width="100%" height="130">
+            <!-- Timeline -->
+            <line x1="40" y1="65" x2="640" y2="65" stroke="#1a1610" stroke-width="1.5"/>
+            <!-- markers -->
+            <circle cx="80" cy="65" r="5" fill="#8b1a1a"/>
+            <text x="80" y="50" text-anchor="middle" font-size="8" fill="#8b1a1a" font-family="'Courier Prime', monospace" font-weight="700">ALOHA</text>
+            <text x="80" y="38" text-anchor="middle" font-size="7" fill="#6b5f50" font-family="'Courier Prime', monospace">1970</text>
+            <text x="80" y="83" text-anchor="middle" font-size="7" fill="#6b5f50" font-family="'Courier Prime', monospace">18% efic.</text>
+            <circle cx="180" cy="65" r="5" fill="#8b1a1a"/>
+            <text x="180" y="50" text-anchor="middle" font-size="8" fill="#8b1a1a" font-family="'Courier Prime', monospace" font-weight="700">Slotted ALOHA</text>
+            <text x="180" y="38" text-anchor="middle" font-size="7" fill="#6b5f50" font-family="'Courier Prime', monospace">1972</text>
+            <text x="180" y="83" text-anchor="middle" font-size="7" fill="#6b5f50" font-family="'Courier Prime', monospace">37% efic.</text>
+            <circle cx="300" cy="65" r="5" fill="#1a3a6b"/>
+            <text x="300" y="50" text-anchor="middle" font-size="8" fill="#1a3a6b" font-family="'Courier Prime', monospace" font-weight="700">CSMA</text>
+            <text x="300" y="38" text-anchor="middle" font-size="7" fill="#6b5f50" font-family="'Courier Prime', monospace">1975</text>
+            <text x="300" y="83" text-anchor="middle" font-size="7" fill="#6b5f50" font-family="'Courier Prime', monospace">≤ 99% teórico</text>
+            <circle cx="420" cy="65" r="5" fill="#1a3a6b"/>
+            <text x="420" y="50" text-anchor="middle" font-size="8" fill="#1a3a6b" font-family="'Courier Prime', monospace" font-weight="700">CSMA/CD</text>
+            <text x="420" y="38" text-anchor="middle" font-size="7" fill="#6b5f50" font-family="'Courier Prime', monospace">Ethernet</text>
+            <text x="420" y="83" text-anchor="middle" font-size="7" fill="#6b5f50" font-family="'Courier Prime', monospace">half-duplex</text>
+            <circle cx="540" cy="65" r="5" fill="#1a4a2a"/>
+            <text x="540" y="50" text-anchor="middle" font-size="8" fill="#1a4a2a" font-family="'Courier Prime', monospace" font-weight="700">Switched / Full-Duplex</text>
+            <text x="540" y="38" text-anchor="middle" font-size="7" fill="#6b5f50" font-family="'Courier Prime', monospace">1990s+</text>
+            <text x="540" y="83" text-anchor="middle" font-size="7" fill="#6b5f50" font-family="'Courier Prime', monospace">sem colisão</text>
+            <!-- Wireless branch -->
+            <line x1="420" y1="70" x2="420" y2="110" stroke="#4a3000" stroke-width="1" stroke-dasharray="3,3"/>
+            <circle cx="420" cy="115" r="4" fill="#4a3000"/>
+            <text x="420" y="128" text-anchor="middle" font-size="7" fill="#4a3000" font-family="'Courier Prime', monospace">CSMA/CA → Wi-Fi</text>
+          </svg>
+          <div class="diagram-caption">Fig. 6.1 — Evolução cronológica dos protocolos de acesso ao meio</div>
+        </div>
+
+        <div class="prose">
+          <h4>Eficiência Máxima de ALOHA</h4>
+        </div>
+
+        <div class="formula">
+          <span class="formula-label">Fórmula 6.1 — Eficiência máxima dos protocolos ALOHA</span>
+ALOHA Puro:       η_max = 1/(2e) ≈ 0.184  (18.4%)
+                  Ocorre em G = 0.5 (G = carga oferecida)
+
+Slotted ALOHA:    η_max = 1/e    ≈ 0.368  (36.8%)
+                  Ocorre em G = 1.0
+
+A distinção: com slots, colisões são confinadas a limites temporais,
+reduzindo sobreposição parcial e dobrando a eficiência máxima.</div>
+
+        <div class="callout">
+          <span class="callout-label">Observação de Engenharia</span>
+          A eficiência do canal em meios compartilhados nunca depende só da velocidade nominal. Ela depende do quão bem a rede coordena a concorrência entre transmissores. Em Ethernet comutada full-duplex contemporânea, colisões deixaram de existir — mas o problema migrou para a gestão de filas e congestionamento.
+        </div>
+      </div>
+      <div class="ch-footer">
+        <span class="ch-footer-left">Redes do Zero ao Avançado</span>
+        <span class="ch-footer-center">◆ ◆ ◆</span>
+        <span class="ch-footer-right">Capítulo 06 · Acesso ao Meio · Mariana BS</span>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 07
+    ══════════════════════════════════════════════ -->
+    <div class="chapter" id="c7">
+      <div class="chapter-body">
+        <div class="ch-number">Capítulo 07</div>
+        <h2 class="ch-title">Ethernet, Endereçamento MAC e Switching</h2>
+        <p class="ch-subtitle">O ecossistema que moldou as LANs modernas.</p>
+        <div class="ch-header-rule"></div>
+        <div class="ch-topics">
+          <span class="ch-topic">quadro Ethernet</span>
+          <span class="ch-topic">endereço MAC</span>
+          <span class="ch-topic">ARP</span>
+          <span class="ch-topic">switch learning</span>
+          <span class="ch-topic">flooding / forwarding</span>
+        </div>
+
+        <div class="prose">
+          <p>A Ethernet consolidou-se como a tecnologia dominante de redes locais por combinar simplicidade estrutural, interoperabilidade e enorme capacidade de evolução. Seu sucesso não veio de sofisticação excessiva, mas de um desenho suficientemente robusto para crescer com o tempo.</p>
+
+          <h4>Estrutura do Quadro Ethernet II</h4>
+        </div>
+
+        <div class="diagram-wrap">
+          <svg viewBox="0 0 680 80" xmlns="http://www.w3.org/2000/svg" width="100%" height="80">
+            <!-- Ethernet frame fields -->
+            <rect x="10" y="20" width="60" height="36" fill="#4a3000" stroke="#1a1610" stroke-width="1"/>
+            <text x="40" y="35" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace" font-weight="700">Preâmbulo</text>
+            <text x="40" y="47" text-anchor="middle" font-size="7" fill="#c8b88a" font-family="'Courier Prime', monospace">7+1 bytes</text>
+            <rect x="72" y="20" width="90" height="36" fill="#8b1a1a" stroke="#1a1610" stroke-width="1"/>
+            <text x="117" y="35" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace" font-weight="700">MAC Destino</text>
+            <text x="117" y="47" text-anchor="middle" font-size="7" fill="#c8b88a" font-family="'Courier Prime', monospace">6 bytes</text>
+            <rect x="164" y="20" width="90" height="36" fill="#8b1a1a" stroke="#1a1610" stroke-width="1"/>
+            <text x="209" y="35" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace" font-weight="700">MAC Origem</text>
+            <text x="209" y="47" text-anchor="middle" font-size="7" fill="#c8b88a" font-family="'Courier Prime', monospace">6 bytes</text>
+            <rect x="256" y="20" width="56" height="36" fill="#1a3a6b" stroke="#1a1610" stroke-width="1"/>
+            <text x="284" y="35" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace" font-weight="700">Tipo</text>
+            <text x="284" y="47" text-anchor="middle" font-size="7" fill="#c8b88a" font-family="'Courier Prime', monospace">2 bytes</text>
+            <rect x="314" y="20" width="240" height="36" fill="#1a1610" stroke="#1a1610" stroke-width="1"/>
+            <text x="434" y="35" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace" font-weight="700">Payload (dados) — 46 a 1500 bytes</text>
+            <text x="434" y="47" text-anchor="middle" font-size="7" fill="#c8b88a" font-family="'Courier Prime', monospace">padding se &lt; 46 bytes</text>
+            <rect x="556" y="20" width="55" height="36" fill="#1a4a2a" stroke="#1a1610" stroke-width="1"/>
+            <text x="583" y="35" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace" font-weight="700">FCS/CRC</text>
+            <text x="583" y="47" text-anchor="middle" font-size="7" fill="#c8b88a" font-family="'Courier Prime', monospace">4 bytes</text>
+            <text x="340" y="68" text-anchor="middle" font-size="8" fill="#6b5f50" font-family="'Courier Prime', monospace">Tamanho total: mínimo 64 bytes · máximo 1518 bytes (sem VLAN tag)</text>
+          </svg>
+          <div class="diagram-caption">Fig. 7.1 — Estrutura do quadro Ethernet II</div>
+        </div>
+
+        <div class="prose">
+          <h4>Algoritmo de Aprendizagem do Switch</h4>
+          <p>Switches operam na camada 2 e constroem a <span class="term">tabela CAM</span> (Content Addressable Memory) de forma autônoma:</p>
+          <ol>
+            <li>Ao receber um quadro, o switch registra o endereço MAC de origem e a porta de entrada na tabela CAM.</li>
+            <li>Para o endereço de destino: se presente na tabela, encaminha seletivamente; se ausente, realiza <em>flooding</em> em todas as portas exceto a de origem.</li>
+            <li>Entradas na CAM expiram após um timeout (tipicamente 300s) para acomodar mudanças de topologia.</li>
+          </ol>
+
+          <h4>ARP — Address Resolution Protocol</h4>
+          <p>Em IPv4, a tradução entre endereço IP (camada 3) e endereço MAC (camada 2) é realizada via ARP. O processo:</p>
+        </div>
+
+        <div class="formula">
+          <span class="formula-label">Sequência ARP (IPv4)</span>
+Host A quer falar com 192.168.1.10 (Host B, mesma sub-rede):
+
+1. A verifica cache ARP local → entrada ausente ou expirada
+2. A transmite ARP Request (broadcast):
+     "Quem tem 192.168.1.10? Diga a AA:BB:CC:DD:EE:FF"
+3. Host B (e somente B) responde com ARP Reply (unicast):
+     "192.168.1.10 está em 11:22:33:44:55:66"
+4. A armazena no cache ARP: 192.168.1.10 → 11:22:33:44:55:66
+5. A constrói quadro Ethernet com MAC destino 11:22:33:44:55:66</div>
+
+        <div class="callout callout-warn">
+          <span class="callout-label">Vetor de Ataque</span>
+          O ARP não tem autenticação. ARP Spoofing (ou ARP Poisoning) consiste em injetar respostas ARP falsas, redirecionando tráfego para um host malicioso. É a base de ataques man-in-the-middle em LANs. Mitigações incluem Dynamic ARP Inspection (DAI) e 802.1X.
+        </div>
+      </div>
+      <div class="ch-footer">
+        <span class="ch-footer-left">Redes do Zero ao Avançado</span>
+        <span class="ch-footer-center">◆ ◆ ◆</span>
+        <span class="ch-footer-right">Capítulo 07 · Ethernet · Mariana BS</span>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 08
+    ══════════════════════════════════════════════ -->
+    <div class="chapter" id="c8">
+      <div class="chapter-body">
+        <div class="ch-number">Capítulo 08</div>
+        <h2 class="ch-title">VLANs, Trunks, STP e Domínios de Camada 2</h2>
+        <p class="ch-subtitle">Segmentação lógica e controle de loops na rede local.</p>
+        <div class="ch-header-rule"></div>
+        <div class="ch-topics">
+          <span class="ch-topic">802.1Q VLAN tagging</span>
+          <span class="ch-topic">trunking</span>
+          <span class="ch-topic">Spanning Tree Protocol</span>
+          <span class="ch-topic">RSTP · MSTP</span>
+          <span class="ch-topic">broadcast storm</span>
+        </div>
+
+        <div class="prose">
+          <p>À medida que uma LAN cresce, torna-se inviável manter toda a rede local em um único domínio de broadcast. VLANs surgem como forma de segmentação lógica: a mesma infraestrutura física passa a suportar vários domínios independentes, cada um com seu escopo de broadcast.</p>
+
+          <h4>802.1Q — VLAN Tagging</h4>
+          <p>O padrão IEEE 802.1Q insere um campo de 4 bytes no quadro Ethernet entre os campos de endereço MAC de origem e Ethertype:</p>
+        </div>
+
+        <div class="diagram-wrap">
+          <svg viewBox="0 0 680 60" xmlns="http://www.w3.org/2000/svg" width="100%" height="60">
+            <rect x="10" y="10" width="65" height="30" fill="#4a3000" stroke="#1a1610" stroke-width="1"/>
+            <text x="42" y="29" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace">Preâmbulo</text>
+            <rect x="77" y="10" width="80" height="30" fill="#8b1a1a" stroke="#1a1610" stroke-width="1"/>
+            <text x="117" y="29" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace">MAC Dest</text>
+            <rect x="159" y="10" width="80" height="30" fill="#8b1a1a" stroke="#1a1610" stroke-width="1"/>
+            <text x="199" y="29" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace">MAC Orig</text>
+            <!-- 802.1Q tag highlighted -->
+            <rect x="241" y="5" width="80" height="40" fill="#e8c870" stroke="#8b6000" stroke-width="2"/>
+            <text x="281" y="22" text-anchor="middle" font-size="8" fill="#3a2000" font-family="'Courier Prime', monospace" font-weight="700">802.1Q TAG</text>
+            <text x="281" y="36" text-anchor="middle" font-size="7" fill="#5a3a00" font-family="'Courier Prime', monospace">TPID+PCP+DEI+VID</text>
+            <rect x="323" y="10" width="50" height="30" fill="#1a3a6b" stroke="#1a1610" stroke-width="1"/>
+            <text x="348" y="29" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace">EtherType</text>
+            <rect x="375" y="10" width="200" height="30" fill="#1a1610" stroke="#1a1610" stroke-width="1"/>
+            <text x="475" y="29" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace">Payload</text>
+            <rect x="577" y="10" width="50" height="30" fill="#1a4a2a" stroke="#1a1610" stroke-width="1"/>
+            <text x="602" y="29" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace">FCS</text>
+            <text x="281" y="54" text-anchor="middle" font-size="7" fill="#8b6000" font-family="'Courier Prime', monospace">VID: 12 bits → 4094 VLANs possíveis (0 e 4095 reservadas)</text>
+          </svg>
+          <div class="diagram-caption">Fig. 8.1 — 802.1Q VLAN tag inserida no quadro Ethernet (4 bytes adicionais)</div>
+        </div>
+
+        <div class="prose">
+          <h4>Spanning Tree Protocol (STP / 802.1D)</h4>
+          <p>A redundância em camada 2 é perigosa sem disciplina. Diferentemente do IP (que usa TTL), quadros Ethernet não expiram naturalmente. Um loop pode fazer tráfego circular indefinidamente, multiplicando broadcasts e unicasts desconhecidos até paralisar a rede.</p>
+          <p>O STP resolve isso elegendo uma <span class="term">Root Bridge</span> e bloqueando seletivamente portas para criar uma topologia lógica livre de loops sobre a malha física redundante.</p>
+        </div>
+
+        <div class="tbl-wrap">
+          <table>
+            <caption>Tabela 8.1 — Evolução do Spanning Tree Protocol</caption>
+            <thead>
+              <tr><th>Variante</th><th>Padrão</th><th>Convergência</th><th>Suporte a múltiplas VLANs</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>STP</strong></td><td>IEEE 802.1D (1990)</td><td>30–50 s</td><td>Não (1 instância global)</td></tr>
+              <tr><td><strong>PVST+</strong></td><td>Cisco proprietário</td><td>30–50 s</td><td>Sim (1 instância por VLAN)</td></tr>
+              <tr><td><strong>RSTP</strong></td><td>IEEE 802.1w (2001)</td><td>1–6 s</td><td>Não (1 instância global)</td></tr>
+              <tr><td><strong>MSTP</strong></td><td>IEEE 802.1s (2002)</td><td>1–6 s</td><td>Sim (grupos de VLANs)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-warn">
+          <span class="callout-label">Risco Crítico</span>
+          Um único loop de camada 2 pode paralisar uma rede inteira em segundos, saturando CPUs de switches e consumindo toda a largura de banda disponível com tráfego circular. É um dos exemplos mais didáticos de como simplicidade aparente pode esconder risco sistêmico elevado. Broadcast storms não são eventos teóricos — ocorrem regularmente em ambientes corporativos mal gerenciados.
+        </div>
+      </div>
+      <div class="ch-footer">
+        <span class="ch-footer-left">Redes do Zero ao Avançado</span>
+        <span class="ch-footer-center">◆ ◆ ◆</span>
+        <span class="ch-footer-right">Capítulo 08 · VLANs e STP · Mariana BS</span>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 09
+    ══════════════════════════════════════════════ -->
+    <div class="chapter" id="c9">
+      <div class="chapter-body">
+        <div class="ch-number">Capítulo 09</div>
+        <h2 class="ch-title">Camada de Rede: IP, Datagramas e o Serviço Best Effort</h2>
+        <p class="ch-subtitle">O plano lógico que conecta redes heterogêneas.</p>
+        <div class="ch-header-rule"></div>
+        <div class="ch-topics">
+          <span class="ch-topic">IPv4 e cabeçalho</span>
+          <span class="ch-topic">TTL e ICMP</span>
+          <span class="ch-topic">fragmentação e MTU</span>
+          <span class="ch-topic">Path MTU Discovery</span>
+        </div>
+
+        <div class="prose">
+          <p>A grande contribuição da camada de rede foi tornar possível a interconexão de redes diferentes sob um mecanismo comum. O IP não exige que todos os enlaces sejam iguais, que todos os equipamentos compartilhem a mesma tecnologia ou que toda a malha tenha garantias idênticas. Ele aceita heterogeneidade.</p>
+
+          <h4>Cabeçalho IPv4 — Campos Relevantes</h4>
+        </div>
+
+        <div class="tbl-wrap">
+          <table>
+            <caption>Tabela 9.1 — Campos relevantes do cabeçalho IPv4 (RFC 791)</caption>
+            <thead>
+              <tr><th>Campo</th><th>Tamanho</th><th>Função</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Version</strong></td><td>4 bits</td><td>Versão do IP (4 para IPv4)</td></tr>
+              <tr><td><strong>IHL</strong></td><td>4 bits</td><td>Comprimento do cabeçalho em palavras de 32 bits</td></tr>
+              <tr><td><strong>DSCP/ECN</strong></td><td>8 bits</td><td>Qualidade de serviço e notificação de congestionamento</td></tr>
+              <tr><td><strong>Total Length</strong></td><td>16 bits</td><td>Comprimento total do datagrama (cabeçalho + dados); max 65.535 bytes</td></tr>
+              <tr><td><strong>Identification</strong></td><td>16 bits</td><td>Identificador único do datagrama (agrupa fragmentos)</td></tr>
+              <tr><td><strong>Flags + Fragment Offset</strong></td><td>3+13 bits</td><td>Controle de fragmentação; DF bit impede fragmentação</td></tr>
+              <tr><td><strong>TTL</strong></td><td>8 bits</td><td>Time-to-Live: decrementado por roteador; pacote descartado ao atingir 0</td></tr>
+              <tr><td><strong>Protocol</strong></td><td>8 bits</td><td>Protocolo da camada superior (6=TCP, 17=UDP, 1=ICMP)</td></tr>
+              <tr><td><strong>Header Checksum</strong></td><td>16 bits</td><td>Verificação de integridade apenas do cabeçalho IP</td></tr>
+              <tr><td><strong>Source / Dest Address</strong></td><td>32 bits cada</td><td>Endereços IPv4 de origem e destino</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="prose">
+          <h4>Fragmentação e MTU</h4>
+        </div>
+
+        <div class="formula">
+          <span class="formula-label">Fórmula 9.1 — Fragmentação IPv4</span>
+Número de fragmentos = ⌈ (L - 20) / (MTU - 20) ⌉
+
+Onde:  L   = tamanho total do datagrama original
+       MTU = Maximum Transmission Unit do enlace
+       20  = tamanho mínimo do cabeçalho IPv4
+
+Exemplo: datagrama de 4000 bytes sobre enlace com MTU 1500:
+  Dados no payload original = 4000 - 20 = 3980 bytes
+  Bytes por fragmento      = 1500 - 20 = 1480 bytes
+  Fragmentos necessários   = ⌈3980/1480⌉ = 3 fragmentos</div>
+
+        <div class="callout callout-note">
+          <span class="callout-label">Path MTU Discovery</span>
+          Para evitar fragmentação — indesejável por custo de processamento e por deixar de funcionar quando o bit DF está ativo — o PMTUD (RFC 1191 / RFC 4821) usa mensagens ICMP "Fragmentation Needed" para descobrir o menor MTU ao longo do caminho. Filtragem de ICMP por firewalls mal configurados é causa frequente de problemas de conectividade silenciosos.
+        </div>
+      </div>
+      <div class="ch-footer">
+        <span class="ch-footer-left">Redes do Zero ao Avançado</span>
+        <span class="ch-footer-center">◆ ◆ ◆</span>
+        <span class="ch-footer-right">Capítulo 09 · Camada de Rede · Mariana BS</span>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 10
+    ══════════════════════════════════════════════ -->
+    <div class="chapter" id="c10">
+      <div class="chapter-body">
+        <div class="ch-number">Capítulo 10</div>
+        <h2 class="ch-title">Roteamento: Algoritmos, Tabelas e Escolha de Caminhos</h2>
+        <p class="ch-subtitle">Como a rede decide por onde os pacotes devem seguir.</p>
+        <div class="ch-header-rule"></div>
+        <div class="ch-topics">
+          <span class="ch-topic">encaminhamento vs. roteamento</span>
+          <span class="ch-topic">Distance Vector · RIP</span>
+          <span class="ch-topic">Link State · OSPF</span>
+          <span class="ch-topic">BGP · path vector</span>
+          <span class="ch-topic">Dijkstra</span>
+        </div>
+
+        <div class="prose">
+          <p>Encaminhamento é a operação de alta velocidade que decide, para cada pacote, qual será a interface de saída. Roteamento é o processo mais amplo de construir e atualizar o conhecimento que alimenta essa decisão. A distinção é conceitualmente importante: um roteador encaminha o tempo todo, mas recalcula ou aprende rotas em ritmos diferentes.</p>
+
+          <h4>Comparação entre Famílias de Algoritmos</h4>
+        </div>
+
+        <div class="tbl-wrap">
+          <table>
+            <caption>Tabela 10.1 — Algoritmos de roteamento: características e trade-offs</caption>
+            <thead>
+              <tr><th>Família</th><th>Exemplo</th><th>Visão da topologia</th><th>Algoritmo base</th><th>Problema clássico</th><th>Escala</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Distance Vector</strong></td><td>RIP, EIGRP</td><td>Local (apenas vizinhos)</td><td>Bellman-Ford</td><td>Contagem ao infinito, convergência lenta</td><td>Pequena a média</td></tr>
+              <tr><td><strong>Link State</strong></td><td>OSPF, IS-IS</td><td>Global (inunda LSAs)</td><td>Dijkstra (SPF)</td><td>Volume de informação em redes grandes</td><td>Média a grande (áreas)</td></tr>
+              <tr><td><strong>Path Vector</strong></td><td>BGP</td><td>Caminhos AS-level</td><td>Política + vetor</td><td>Convergência lenta, manipulação de política</td><td>Internet (ilimitada)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="prose">
+          <h4>Algoritmo de Dijkstra (Link State)</h4>
+        </div>
+
+        <div class="formula">
+          <span class="formula-label">Pseudocódigo 10.1 — Dijkstra SPF simplificado</span>
+Inicialização:
+  D(v) = ∞ para todo v ≠ origem
+  D(origem) = 0
+  N' = {origem}
+
+Loop (até todos os nós estarem em N'):
+  Para cada w não em N' adjacente a u (último adicionado):
+    D(w) = min( D(w),  D(u) + c(u,w) )
+  Adicionar a N' o nó w* com menor D(w*)
+
+Resultado:
+  D(v) = custo do menor caminho de origem até v
+  Predecessor de cada nó → reconstrução do caminho
+
+Complexidade: O(n²) básico · O((n+e)·log n) com heap binário</div>
+
+        <div class="callout">
+          <span class="callout-label">Princípio Fundamental</span>
+          A rede não "adivinha" o melhor caminho. Ela calcula ou aprende caminhos de acordo com métricas, anúncios e limites administrativos. "Melhor caminho" é sempre uma decisão técnica condicionada por política — menor saltos, menor custo, maior capacidade, ou conformidade a regras comerciais entre operadoras.
+        </div>
+      </div>
+      <div class="ch-footer">
+        <span class="ch-footer-left">Redes do Zero ao Avançado</span>
+        <span class="ch-footer-center">◆ ◆ ◆</span>
+        <span class="ch-footer-right">Capítulo 10 · Roteamento · Mariana BS</span>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 11
+    ══════════════════════════════════════════════ -->
+    <div class="chapter" id="c11">
+      <div class="chapter-body">
+        <div class="ch-number">Capítulo 11</div>
+        <h2 class="ch-title">Endereçamento, Subnetting, Sumarização, NAT e IPv6</h2>
+        <p class="ch-subtitle">A arquitetura de endereçamento que conecta bilhões de dispositivos.</p>
+        <div class="ch-header-rule"></div>
+        <div class="ch-topics">
+          <span class="ch-topic">CIDR · VLSM</span>
+          <span class="ch-topic">subnetting</span>
+          <span class="ch-topic">NAT e PAT</span>
+          <span class="ch-topic">IPv6 e transição</span>
+          <span class="ch-topic">espaços privados RFC 1918</span>
+        </div>
+
+        <div class="prose">
+          <p>O endereçamento IP é o mecanismo de identidade lógica da rede. Diferentemente do MAC (identidade de interface), o IP é hierárquico e topologicamente significativo: o prefixo de rede indica a posição no espaço de endereçamento, o que permite roteamento eficiente por agregação.</p>
+
+          <h4>Subnetting — Cálculo Essencial</h4>
+        </div>
+
+        <div class="formula">
+          <span class="formula-label">Fórmula 11.1 — Sub-redes e hosts</span>
+Dada a sub-rede x.x.x.x/n:
+
+  Máscara de rede      = n bits '1' seguidos de (32-n) bits '0'
+  Número de hosts      = 2^(32-n) - 2
+  Endereço de rede     = AND bitwise entre IP e máscara
+  Broadcast           = OR bitwise entre rede e complemento da máscara
+  Primeiro host        = endereço de rede + 1
+  Último host          = broadcast - 1
+  Próxima sub-rede     = endereço de rede + 2^(32-n)
+
+Exemplo: 192.168.10.0/26
+  Máscara   = 255.255.255.192  (/26 = 11111111.11111111.11111111.11000000)
+  Hosts     = 2^6 - 2 = 62 hosts utilizáveis
+  Broadcast = 192.168.10.63
+  Próxima   = 192.168.10.64</div>
+
+        <div class="tbl-wrap">
+          <table>
+            <caption>Tabela 11.1 — Espaços de endereçamento privado (RFC 1918) e endereços especiais</caption>
+            <thead>
+              <tr><th>Faixa</th><th>CIDR</th><th>Hosts teóricos</th><th>Uso típico</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>10.0.0.0 – 10.255.255.255</td><td>10.0.0.0/8</td><td>16.777.214</td><td>Redes corporativas grandes</td></tr>
+              <tr><td>172.16.0.0 – 172.31.255.255</td><td>172.16.0.0/12</td><td>1.048.574</td><td>Redes médias</td></tr>
+              <tr><td>192.168.0.0 – 192.168.255.255</td><td>192.168.0.0/16</td><td>65.534</td><td>Redes domésticas e SOHO</td></tr>
+              <tr><td>127.0.0.0 – 127.255.255.255</td><td>127.0.0.0/8</td><td>—</td><td>Loopback (127.0.0.1 ≡ localhost)</td></tr>
+              <tr><td>169.254.0.0 – 169.254.255.255</td><td>169.254.0.0/16</td><td>—</td><td>APIPA (link-local IPv4)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="prose">
+          <h4>IPv6 — O Herdeiro</h4>
+          <p>IPv6 usa endereços de 128 bits (vs 32 bits em IPv4), eliminando a escassez de endereços e dispensando NAT obrigatório. Outros aprimoramentos incluem: cabeçalho simplificado, autoconfiguração de endereço (SLAAC), IPsec integrado ao design original, e multicast nativo substituindo broadcast.</p>
+        </div>
+
+        <div class="formula">
+          <span class="formula-label">Comparação rápida: IPv4 vs IPv6</span>
+                    IPv4                    IPv6
+Espaço:     2^32  ≈ 4,3 × 10⁹        2^128 ≈ 3,4 × 10^38
+Notação:    decimal pontuado          hexadecimal colonado
+            (192.168.1.1)            (2001:db8::1)
+Cabeçalho:  20–60 bytes (variável)   40 bytes (fixo)
+Fragmentação: por roteadores         somente na origem
+Broadcast:  sim                      não (multicast/anycast)
+NAT:        frequente                desnecessário</div>
+
+        <div class="callout callout-note">
+          <span class="callout-label">Transição IPv4 → IPv6</span>
+          As principais técnicas de coexistência incluem: dual-stack (hosts falam ambos os protocolos), tunneling (encapsula IPv6 dentro de IPv4 para travessia de redes legadas) e NAT64/DNS64 (tradução entre os dois espaços de endereços). A transição tem progresso desigual pelo mundo — Brasil e outros países emergentes apresentam adoção IPv6 crescente mas ainda coexistente com IPv4 predominante.
+        </div>
+      </div>
+      <div class="ch-footer">
+        <span class="ch-footer-left">Redes do Zero ao Avançado</span>
+        <span class="ch-footer-center">◆ ◆ ◆</span>
+        <span class="ch-footer-right">Capítulo 11 · Endereçamento · Mariana BS</span>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 12
+    ══════════════════════════════════════════════ -->
+    <div class="chapter" id="c12">
+      <div class="chapter-body">
+        <div class="ch-number">Capítulo 12</div>
+        <h2 class="ch-title">Transporte: Sockets, Portas, TCP, UDP e QUIC</h2>
+        <p class="ch-subtitle">A camada que entrega dados às aplicações com o nível de confiabilidade necessário.</p>
+        <div class="ch-header-rule"></div>
+        <div class="ch-topics">
+          <span class="ch-topic">sockets e multiplexação</span>
+          <span class="ch-topic">three-way handshake</span>
+          <span class="ch-topic">controle de fluxo TCP</span>
+          <span class="ch-topic">controle de congestionamento</span>
+          <span class="ch-topic">UDP · QUIC</span>
+        </div>
+
+        <div class="prose">
+          <p>A camada de transporte resolve dois problemas que o IP ignora deliberadamente: multiplexação entre processos (distinguir qual aplicação deve receber cada datagrama) e — no caso do TCP — garantia de entrega e ordem.</p>
+
+          <h4>TCP — Three-Way Handshake</h4>
+        </div>
+
+        <div class="diagram-wrap">
+          <svg viewBox="0 0 680 180" xmlns="http://www.w3.org/2000/svg" width="100%" height="180">
+            <!-- Client/Server lines -->
+            <text x="150" y="20" text-anchor="middle" font-size="10" fill="#1a1610" font-family="'Courier Prime', monospace" font-weight="700">CLIENTE</text>
+            <text x="530" y="20" text-anchor="middle" font-size="10" fill="#1a1610" font-family="'Courier Prime', monospace" font-weight="700">SERVIDOR</text>
+            <line x1="150" y1="25" x2="150" y2="175" stroke="#1a1610" stroke-width="1.5"/>
+            <line x1="530" y1="25" x2="530" y2="175" stroke="#1a1610" stroke-width="1.5"/>
+            <!-- SYN -->
+            <line x1="150" y1="55" x2="525" y2="80" stroke="#8b1a1a" stroke-width="1.5" marker-end="url(#arr)"/>
+            <text x="340" y="62" text-anchor="middle" font-size="9" fill="#8b1a1a" font-family="'Courier Prime', monospace" font-weight="700">SYN  seq=x</text>
+            <!-- SYN-ACK -->
+            <line x1="530" y1="90" x2="155" y2="115" stroke="#1a3a6b" stroke-width="1.5" marker-end="url(#arr)"/>
+            <text x="340" y="100" text-anchor="middle" font-size="9" fill="#1a3a6b" font-family="'Courier Prime', monospace" font-weight="700">SYN-ACK  seq=y, ack=x+1</text>
+            <!-- ACK -->
+            <line x1="150" y1="125" x2="525" y2="148" stroke="#1a4a2a" stroke-width="1.5" marker-end="url(#arr)"/>
+            <text x="340" y="133" text-anchor="middle" font-size="9" fill="#1a4a2a" font-family="'Courier Prime', monospace" font-weight="700">ACK  ack=y+1</text>
+            <!-- connection established label -->
+            <line x1="100" y1="158" x2="580" y2="158" stroke="#9a8f80" stroke-width="0.5" stroke-dasharray="4,3"/>
+            <text x="340" y="173" text-anchor="middle" font-size="9" fill="#6b5f50" font-family="'Courier Prime', monospace">conexão estabelecida · troca de ISNs (Initial Sequence Numbers)</text>
+            <!-- state labels -->
+            <text x="60" y="58" text-anchor="middle" font-size="7" fill="#6b5f50" font-family="'Courier Prime', monospace">SYN_SENT</text>
+            <text x="60" y="128" text-anchor="middle" font-size="7" fill="#1a4a2a" font-family="'Courier Prime', monospace">ESTABLISHED</text>
+            <text x="610" y="83" text-anchor="middle" font-size="7" fill="#6b5f50" font-family="'Courier Prime', monospace">SYN_RCVD</text>
+            <text x="610" y="150" text-anchor="middle" font-size="7" fill="#1a4a2a" font-family="'Courier Prime', monospace">ESTABLISHED</text>
+          </svg>
+          <div class="diagram-caption">Fig. 12.1 — TCP three-way handshake com troca de ISNs e transição de estados</div>
+        </div>
+
+        <div class="tbl-wrap">
+          <table>
+            <caption>Tabela 12.1 — TCP vs UDP vs QUIC: comparação funcional</caption>
+            <thead>
+              <tr><th>Característica</th><th>TCP</th><th>UDP</th><th>QUIC</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Orientado a conexão</td><td>Sim (3-way handshake)</td><td>Não</td><td>Sim (0-RTT / 1-RTT)</td></tr>
+              <tr><td>Entrega garantida</td><td>Sim (ARQ)</td><td>Não</td><td>Sim (streams independentes)</td></tr>
+              <tr><td>Ordenação</td><td>Sim (por seq. number)</td><td>Não</td><td>Sim (por stream)</td></tr>
+              <tr><td>Controle de congestionamento</td><td>Sim (Reno, CUBIC, BBR)</td><td>Não (responsabilidade da app)</td><td>Sim (CUBIC, BBR)</td></tr>
+              <tr><td>Head-of-line blocking</td><td>Sim (por conexão)</td><td>Não</td><td>Não (isolado por stream)</td></tr>
+              <tr><td>Transporte base</td><td>IP</td><td>IP</td><td>UDP / IP</td></tr>
+              <tr><td>Criptografia integrada</td><td>Não (TLS sobre TCP)</td><td>Não</td><td>Sim (TLS 1.3 obrigatório)</td></tr>
+              <tr><td>Uso típico</td><td>HTTP/1.1, HTTP/2, SSH, SMTP</td><td>DNS, DHCP, RTP, jogos</td><td>HTTP/3, performance crítica</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="prose">
+          <h4>Controle de Congestionamento TCP</h4>
+        </div>
+
+        <div class="formula">
+          <span class="formula-label">Fórmula 12.1 — Fases do controle de congestionamento TCP</span>
+SLOW START:
+  cwnd ← 1 MSS
+  Por ACK recebido: cwnd += 1 MSS  (crescimento exponencial)
+  Até cwnd = ssthresh
+
+CONGESTION AVOIDANCE:
+  Por RTT: cwnd += 1 MSS            (crescimento linear)
+
+AO DETECTAR PERDA:
+  Timeout:          ssthresh = cwnd/2 · cwnd = 1 · volta ao Slow Start
+  3 ACKs duplicados: ssthresh = cwnd/2 · cwnd = ssthresh (Fast Recovery)
+
+Onde: cwnd   = congestion window
+      ssthresh = slow start threshold
+      MSS    = Maximum Segment Size</div>
+
+      </div>
+      <div class="ch-footer">
+        <span class="ch-footer-left">Redes do Zero ao Avançado</span>
+        <span class="ch-footer-center">◆ ◆ ◆</span>
+        <span class="ch-footer-right">Capítulo 12 · Transporte · Mariana BS</span>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 13
+    ══════════════════════════════════════════════ -->
+    <div class="chapter" id="c13">
+      <div class="chapter-body">
+        <div class="ch-number">Capítulo 13</div>
+        <h2 class="ch-title">Análise Formal de Atraso, Vazão e Eficiência</h2>
+        <p class="ch-subtitle">Modelos matemáticos para prever e diagnosticar comportamento de rede.</p>
+        <div class="ch-header-rule"></div>
+        <div class="ch-topics">
+          <span class="ch-topic">decomposição de atraso</span>
+          <span class="ch-topic">bandwidth-delay product</span>
+          <span class="ch-topic">throughput vs goodput</span>
+          <span class="ch-topic">eficiência de protocolo</span>
+        </div>
+
+        <div class="prose">
+          <p>O profissional que deseja domínio universitário de redes precisa ser capaz de modelar comportamento, não apenas descrevê-lo. Uma forma essencial de começar é decompor o atraso total de um fluxo em componentes mensuráveis.</p>
+        </div>
+
+        <div class="formula">
+          <span class="formula-label">Fórmula 13.1 — Decomposição do atraso total</span>
+d_total = d_proc + d_fila + d_trans + d_prop
+
+d_proc  = tempo de inspeção e lookup no roteador        [µs a ms]
+d_fila  = espera na fila de saída do roteador           [variável]
+d_trans = L / R    (L = bits do pacote, R = taxa do enlace)
+d_prop  = d / v    (d = distância, v ≈ 2×10⁸ m/s na fibra)
+
+Exemplo:  Enlace 100 Mbps · pacote 1500 bytes · distância 1000 km
+  d_trans = (1500×8) / (100×10⁶) = 0,12 ms
+  d_prop  = 1.000.000 / 200.000.000 = 5 ms
+  → propagação domina · janelas TCP devem ser grandes</div>
+
+        <div class="formula">
+          <span class="formula-label">Fórmula 13.2 — Bandwidth-Delay Product</span>
+BDP = largura de banda × RTT
+
+Exemplo:  100 Mbps · RTT = 100 ms
+  BDP = 100×10⁶ × 0,1 = 10^7 bits = 10 Mbits = 1,25 MB
+
+Interpretação: 1,25 MB de dados estão "em voo" no caminho.
+Para aproveitar plenamente o enlace, a janela TCP deve ser ≥ BDP.
+Uma janela TCP padrão de 64 KB em enlace de 10 Gbps / 100 ms RTT
+utiliza apenas 0,05% da capacidade disponível.</div>
+
+        <div class="callout callout-note">
+          <span class="callout-label">Observação Prática</span>
+          O BDP revela por que sistemas com janelas TCP pequenas em enlaces de longa distância e alta capacidade (links intercontinentais, satélites) sofrem de throughput drasticamente inferior ao limite do enlace — mesmo sem qualquer perda de pacote ou congestionamento. O problema é puramente de protocolo, não de capacidade física.
+        </div>
+      </div>
+      <div class="ch-footer">
+        <span class="ch-footer-left">Redes do Zero ao Avançado</span>
+        <span class="ch-footer-center">◆ ◆ ◆</span>
+        <span class="ch-footer-right">Capítulo 13 · Atraso e Vazão · Mariana BS</span>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 14
+    ══════════════════════════════════════════════ -->
+    <div class="chapter" id="c14">
+      <div class="chapter-body">
+        <div class="ch-number">Capítulo 14</div>
+        <h2 class="ch-title">Filas, Contenção e Teoria de Congestionamento</h2>
+        <p class="ch-subtitle">Uma introdução prática à modelagem de sistemas sobrecarregados.</p>
+        <div class="ch-header-rule"></div>
+        <div class="ch-topics">
+          <span class="ch-topic">modelos de fila M/M/1</span>
+          <span class="ch-topic">utilização e atraso</span>
+          <span class="ch-topic">bufferbloat</span>
+          <span class="ch-topic">colapso de congestionamento</span>
+        </div>
+
+        <div class="prose">
+          <p>Filas aparecem sempre que a taxa de chegada de trabalho compete com a taxa de serviço do sistema. Em redes, isso significa pacotes esperando para ser processados ou transmitidos. Enquanto a fila é pequena e controlada, ela suaviza variações temporárias. Quando a utilização se aproxima demais do limite, o atraso cresce de forma não linear.</p>
+
+          <h4>Modelo M/M/1 — Intuição</h4>
+        </div>
+
+        <div class="formula">
+          <span class="formula-label">Fórmula 14.1 — Fila M/M/1 simplificada</span>
+ρ = λ / μ          (utilização: taxa de chegada / taxa de serviço)
+
+Atraso médio:  W = 1 / (μ - λ) = 1 / (μ · (1 - ρ))
+
+Comprimento médio da fila: Lq = ρ² / (1 - ρ)
+
+Comportamento assintótico:
+  ρ → 1  ⟹  W → ∞  (atraso explode)
+  ρ = 0.5 → W = 2/μ  (duas vezes o tempo de serviço)
+  ρ = 0.9 → W = 10/μ (dez vezes o tempo de serviço)
+  ρ = 0.99→ W = 100/μ (cem vezes o tempo de serviço)
+
+Conclusão operacional: operar acima de 70–80% de utilização
+continuamente provoca degradação exponencial de latência.</div>
+
+        <div class="diagram-wrap">
+          <svg viewBox="0 0 680 170" xmlns="http://www.w3.org/2000/svg" width="100%" height="170">
+            <!-- Utilization vs Delay graph -->
+            <text x="340" y="16" text-anchor="middle" font-size="9" fill="#6b5f50" font-family="'Courier Prime', monospace">Curva de atraso M/M/1: utilização vs. atraso normalizado</text>
+            <!-- axes -->
+            <line x1="60" y1="145" x2="620" y2="145" stroke="#1a1610" stroke-width="1.5"/>
+            <line x1="60" y1="145" x2="60" y2="25" stroke="#1a1610" stroke-width="1.5"/>
+            <!-- x labels -->
+            <text x="130" y="158" text-anchor="middle" font-size="8" fill="#6b5f50" font-family="'Courier Prime', monospace">20%</text>
+            <text x="200" y="158" text-anchor="middle" font-size="8" fill="#6b5f50" font-family="'Courier Prime', monospace">40%</text>
+            <text x="270" y="158" text-anchor="middle" font-size="8" fill="#6b5f50" font-family="'Courier Prime', monospace">60%</text>
+            <text x="360" y="158" text-anchor="middle" font-size="8" fill="#6b5f50" font-family="'Courier Prime', monospace">80%</text>
+            <text x="470" y="158" text-anchor="middle" font-size="8" fill="#8b1a1a" font-family="'Courier Prime', monospace" font-weight="700">90%</text>
+            <text x="560" y="158" text-anchor="middle" font-size="8" fill="#8b1a1a" font-family="'Courier Prime', monospace" font-weight="700">95%</text>
+            <text x="340" y="170" text-anchor="middle" font-size="8" fill="#1a1610" font-family="'Courier Prime', monospace">Utilização do enlace (ρ)</text>
+            <text x="18" y="90" text-anchor="middle" font-size="8" fill="#1a1610" font-family="'Courier Prime', monospace" transform="rotate(-90,18,90)">Atraso (×W₀)</text>
+            <!-- curve: ρ=0 to ρ=0.95, exponential -->
+            <path d="M60,143 C130,140 200,137 270,130 C310,124 340,116 360,106 C390,90 420,72 460,52 C490,36 530,28 570,24" fill="none" stroke="#8b1a1a" stroke-width="2.5"/>
+            <!-- shade danger zone -->
+            <rect x="430" y="25" width="190" height="120" fill="rgba(139,26,26,0.06)" stroke="rgba(139,26,26,0.2)" stroke-width="1" stroke-dasharray="4,3"/>
+            <text x="520" y="45" text-anchor="middle" font-size="8" fill="#8b1a1a" font-family="'Courier Prime', monospace">zona de</text>
+            <text x="520" y="56" text-anchor="middle" font-size="8" fill="#8b1a1a" font-family="'Courier Prime', monospace">saturação</text>
+            <!-- safe zone marker -->
+            <line x1="60" y1="120" x2="360" y2="120" stroke="#1a4a2a" stroke-width="0.8" stroke-dasharray="3,3"/>
+            <text x="200" y="115" text-anchor="middle" font-size="7" fill="#1a4a2a" font-family="'Courier Prime', monospace">zona operacional segura</text>
+          </svg>
+          <div class="diagram-caption">Fig. 14.1 — Curva M/M/1: o atraso cresce de forma não linear quando ρ → 1</div>
+        </div>
+
+        <div class="callout">
+          <span class="callout-label">Princípio de Operação</span>
+          Capacidade alta não impede congestionamento. Congestionamento é uma relação entre oferta, demanda, temporização e disciplina de fila. Redes de qualidade não eliminam fila; elas a controlam com inteligência — usando técnicas como AQM (Active Queue Management), RED e CoDel para sinalizar congestionamento antes que as filas explodam.
+        </div>
+      </div>
+      <div class="ch-footer">
+        <span class="ch-footer-left">Redes do Zero ao Avançado</span>
+        <span class="ch-footer-center">◆ ◆ ◆</span>
+        <span class="ch-footer-right">Capítulo 14 · Filas · Mariana BS</span>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 15
+    ══════════════════════════════════════════════ -->
+    <div class="chapter" id="c15">
+      <div class="chapter-body">
+        <div class="ch-number">Capítulo 15</div>
+        <h2 class="ch-title">Qualidade de Serviço e Diferenciação de Tráfego</h2>
+        <p class="ch-subtitle">Quando a rede precisa decidir quem espera, quem passa e em que ordem.</p>
+        <div class="ch-header-rule"></div>
+        <div class="ch-topics">
+          <span class="ch-topic">IntServ e DiffServ</span>
+          <span class="ch-topic">DSCP marcação</span>
+          <span class="ch-topic">filas PQ · WFQ · CBWFQ</span>
+          <span class="ch-topic">policing e shaping</span>
+        </div>
+
+        <div class="prose">
+          <p>Nem todo fluxo reage do mesmo modo ao atraso. Uma cópia de arquivo tolera espera melhor que uma chamada de voz. Um stream interativo de vídeo pode tolerar pequena perda melhor que grande jitter. QoS existe para tratar diferentes classes de tráfego de modo coerente com seus requisitos.</p>
+
+          <h4>Requisitos por Tipo de Aplicação</h4>
+        </div>
+
+        <div class="tbl-wrap">
+          <table>
+            <caption>Tabela 15.1 — Requisitos de QoS por classe de aplicação</caption>
+            <thead>
+              <tr><th>Aplicação</th><th>Sensibilidade à Latência</th><th>Sensibilidade ao Jitter</th><th>Tolerância à Perda</th><th>Requisito de Largura de Banda</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Voz VoIP (G.711)</strong></td><td>Alta (&lt; 150 ms)</td><td>Muito alta (&lt; 30 ms)</td><td>Baixa (&lt; 1%)</td><td>Baixa (~64–80 Kbps)</td></tr>
+              <tr><td><strong>Videoconferência HD</strong></td><td>Alta (&lt; 200 ms)</td><td>Alta (&lt; 50 ms)</td><td>Moderada (&lt; 2%)</td><td>Média–Alta (1–8 Mbps)</td></tr>
+              <tr><td><strong>Streaming vídeo (buffered)</strong></td><td>Baixa</td><td>Baixa (buffer absorve)</td><td>Muito baixa</td><td>Alta (variável)</td></tr>
+              <tr><td><strong>Transações ERP/banco</strong></td><td>Moderada</td><td>Baixa</td><td>Zero (TCP retransmite)</td><td>Baixa–Média</td></tr>
+              <tr><td><strong>Backup / transferência em bulk</strong></td><td>Muito baixa</td><td>Irrelevante</td><td>Zero (TCP)</td><td>Alta quando disponível</td></tr>
+              <tr><td><strong>Sinalização de rede (BGP, OSPF)</strong></td><td>Moderada</td><td>Baixa</td><td>Muito baixa</td><td>Muito baixa</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="prose">
+          <h4>DiffServ — Campo DSCP</h4>
+        </div>
+
+        <div class="formula">
+          <span class="formula-label">Tabela 15.2 — Classes DSCP relevantes (RFC 2474 / RFC 3246)</span>
+DSCP      Valor  PHB         Uso típico
+──────────────────────────────────────────────────────
+EF        46     Expedited   VoIP, sinalização crítica
+AF41      34     Assured 4   Vídeo interativo
+AF31      26     Assured 3   Chamadas de vídeo
+AF21      18     Assured 2   Dados transacionais
+AF11      10     Assured 1   Dados em bulk de alta prioridade
+CS0/BE     0     Best Effort Tráfego sem classificação
+CS1        8     Scavenger   Tráfego de baixa prioridade
+
+PHB = Per-Hop Behavior (comportamento em cada nó intermediário)</div>
+
+        <div class="callout">
+          <span class="callout-label">Princípio Essencial</span>
+          QoS não cria capacidade onde ela não existe. QoS é gestão de escassez e de prioridade. Em um enlace saturado, privilegiar voz implica em degradar algo mais — usualmente tráfego de dados em bulk. O design de QoS é, fundamentalmente, uma decisão de negócio traduzida em política técnica.
+        </div>
+      </div>
+      <div class="ch-footer">
+        <span class="ch-footer-left">Redes do Zero ao Avançado</span>
+        <span class="ch-footer-center">◆ ◆ ◆</span>
+        <span class="ch-footer-right">Capítulo 15 · QoS · Mariana BS</span>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 16
+    ══════════════════════════════════════════════ -->
+    <div class="chapter" id="c16">
+      <div class="chapter-body">
+        <div class="ch-number">Capítulo 16</div>
+        <h2 class="ch-title">Aplicação: DNS, Web, Correio, Sincronização e Serviços Críticos</h2>
+        <p class="ch-subtitle">Os protocolos que dão rosto à rede.</p>
+        <div class="ch-header-rule"></div>
+        <div class="ch-topics">
+          <span class="ch-topic">DNS hierárquico</span>
+          <span class="ch-topic">HTTP/1.1 · HTTP/2 · HTTP/3</span>
+          <span class="ch-topic">SMTP · IMAP</span>
+          <span class="ch-topic">DHCP · NTP · SSH</span>
+        </div>
+
+        <div class="prose">
+          <p>A camada de aplicação é onde a rede se torna concretamente útil para pessoas e sistemas. Uma compreensão profunda exige ir além do uso superficial dos serviços e entender como os protocolos se interagem, quais são suas vulnerabilidades e como evoluíram.</p>
+
+          <h4>DNS — Resolução Hierárquica</h4>
+        </div>
+
+        <div class="diagram-wrap">
+          <svg viewBox="0 0 680 160" xmlns="http://www.w3.org/2000/svg" width="100%" height="160">
+            <!-- DNS hierarchy -->
+            <text x="340" y="16" text-anchor="middle" font-size="9" fill="#6b5f50" font-family="'Courier Prime', monospace">Consulta DNS iterativa para www.example.com.br</text>
+            <!-- nodes -->
+            <rect x="10" y="30" width="100" height="30" fill="#1a1610" stroke="none"/>
+            <text x="60" y="49" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace">Host / App</text>
+            <rect x="130" y="30" width="110" height="30" fill="#1a3a6b" stroke="none"/>
+            <text x="185" y="49" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace">Resolvedor Recursivo</text>
+            <rect x="260" y="30" width="100" height="30" fill="#8b1a1a" stroke="none"/>
+            <text x="310" y="49" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace">Root Server (.)</text>
+            <rect x="375" y="30" width="120" height="30" fill="#8b1a1a" stroke="none"/>
+            <text x="435" y="49" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace">TLD Server (.com.br)</text>
+            <rect x="510" y="30" width="130" height="30" fill="#1a4a2a" stroke="none"/>
+            <text x="575" y="42" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace">Autoritativo</text>
+            <text x="575" y="54" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace">(example.com.br)</text>
+            <!-- arrows -->
+            <line x1="110" y1="45" x2="128" y2="45" stroke="#c8b88a" stroke-width="1" marker-end="url(#arr)"/>
+            <text x="119" y="40" font-size="6" fill="#c8b88a" font-family="'Courier Prime', monospace">1</text>
+            <line x1="240" y1="42" x2="258" y2="42" stroke="#c8b88a" stroke-width="1" marker-end="url(#arr)"/>
+            <text x="248" y="37" font-size="6" fill="#c8b88a" font-family="'Courier Prime', monospace">2</text>
+            <line x1="360" y1="48" x2="373" y2="48" stroke="#c8b88a" stroke-width="1" marker-end="url(#arr)"/>
+            <text x="365" y="43" font-size="6" fill="#c8b88a" font-family="'Courier Prime', monospace">3→</text>
+            <line x1="495" y1="48" x2="508" y2="48" stroke="#c8b88a" stroke-width="1" marker-end="url(#arr)"/>
+            <text x="500" y="43" font-size="6" fill="#c8b88a" font-family="'Courier Prime', monospace">4→</text>
+            <!-- return path -->
+            <path d="M575,62 Q575,110 185,110" fill="none" stroke="#1a4a2a" stroke-width="1" stroke-dasharray="4,3"/>
+            <text x="380" y="125" text-anchor="middle" font-size="8" fill="#1a4a2a" font-family="'Courier Prime', monospace">5. Resposta: www.example.com.br → 198.51.100.42</text>
+            <path d="M185,110 L185,62" fill="none" stroke="#1a4a2a" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+            <line x1="128" y1="55" x2="110" y2="55" stroke="#1a4a2a" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+            <text x="119" y="70" font-size="6" fill="#1a4a2a" font-family="'Courier Prime', monospace">6. cache+entrega</text>
+          </svg>
+          <div class="diagram-caption">Fig. 16.1 — Resolução DNS iterativa com cache no resolvedor recursivo</div>
+        </div>
+
+        <div class="tbl-wrap">
+          <table>
+            <caption>Tabela 16.1 — Evolução do HTTP</caption>
+            <thead>
+              <tr><th>Versão</th><th>Conexão</th><th>Multiplexação</th><th>Compressão Header</th><th>Transporte</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>HTTP/1.0</strong></td><td>Uma por requisição</td><td>Não</td><td>Não</td><td>TCP</td></tr>
+              <tr><td><strong>HTTP/1.1</strong></td><td>Keep-alive (persistente)</td><td>Parcial (pipeline, HoL)</td><td>Não</td><td>TCP</td></tr>
+              <tr><td><strong>HTTP/2</strong></td><td>Uma por origem (multiplexada)</td><td>Sim (streams binários)</td><td>Sim (HPACK)</td><td>TCP (HoL em nível TCP)</td></tr>
+              <tr><td><strong>HTTP/3</strong></td><td>Uma por origem (QUIC streams)</td><td>Sim (sem HoL)</td><td>Sim (QPACK)</td><td>QUIC/UDP (TLS 1.3 obrigatório)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="ch-footer">
+        <span class="ch-footer-left">Redes do Zero ao Avançado</span>
+        <span class="ch-footer-center">◆ ◆ ◆</span>
+        <span class="ch-footer-right">Capítulo 16 · Aplicação · Mariana BS</span>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 17
+    ══════════════════════════════════════════════ -->
+    <div class="chapter" id="c17">
+      <div class="chapter-body">
+        <div class="ch-number">Capítulo 17</div>
+        <h2 class="ch-title">Segurança de Redes: Segmentação, Criptografia, Exposição e Confiança</h2>
+        <p class="ch-subtitle">A rede como superfície de ataque e como mecanismo de proteção.</p>
+        <div class="ch-header-rule"></div>
+        <div class="ch-topics">
+          <span class="ch-topic">CIA e autenticidade</span>
+          <span class="ch-topic">TLS · IPsec · VPN</span>
+          <span class="ch-topic">segmentação e blast radius</span>
+          <span class="ch-topic">ARP spoofing · DNS poisoning</span>
+          <span class="ch-topic">Zero Trust</span>
+        </div>
+
+        <div class="prose">
+          <p>Segurança de redes não é um produto isolado. Ela é o resultado de desenho, controle, segmentação, criptografia, autenticação, visibilidade e resposta. Uma rede segura não é a que possui mais caixas; é a que limita exposição e permite perceber desvio.</p>
+
+          <h4>Princípios Fundamentais</h4>
+        </div>
+
+        <div class="cards-grid">
+          <div class="card-item">
+            <div class="card-head">Confidencialidade</div>
+            <p>Proteger conteúdo contra acesso indevido. Implementada por criptografia simétrica (AES-256) e assimétrica (RSA, ECDH), em repouso e em trânsito.</p>
+          </div>
+          <div class="card-item">
+            <div class="card-head">Integridade</div>
+            <p>Impedir alteração não autorizada. Garantida por MACs (HMAC-SHA256), assinaturas digitais e checksums criptográficos.</p>
+          </div>
+          <div class="card-item">
+            <div class="card-head">Disponibilidade</div>
+            <p>Manter serviço utilizável. Ameaçada por DoS, DDoS, ransomware, falhas físicas e congestionamento. Mitigada por redundância, scrubbing e QoS.</p>
+          </div>
+          <div class="card-item">
+            <div class="card-head">Autenticidade</div>
+            <p>Saber quem está falando. 802.1X, MFA, certificados X.509, DNSSEC, BGP RPKI e DANE são mecanismos que vinculam identidade a comunicações.</p>
+          </div>
+        </div>
+
+        <div class="prose">
+          <h4>Ataques Clássicos de Rede</h4>
+        </div>
+
+        <div class="tbl-wrap">
+          <table>
+            <caption>Tabela 17.1 — Vetores de ataque em rede e contramedidas</caption>
+            <thead>
+              <tr><th>Ataque</th><th>Camada</th><th>Mecanismo</th><th>Contramedida Principal</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>ARP Spoofing</strong></td><td>L2</td><td>Respostas ARP falsas redirecionam tráfego</td><td>Dynamic ARP Inspection (DAI), 802.1X</td></tr>
+              <tr><td><strong>DNS Poisoning</strong></td><td>L7</td><td>Injeção de respostas DNS forjadas</td><td>DNSSEC, DNS sobre TLS (DoT) / HTTPS (DoH)</td></tr>
+              <tr><td><strong>BGP Hijacking</strong></td><td>L3</td><td>Anúncio de prefixos IP de terceiros</td><td>RPKI (Route Origin Validation), BGPsec</td></tr>
+              <tr><td><strong>VLAN Hopping</strong></td><td>L2</td><td>Double-tagging ou switch spoofing</td><td>Desativar DTP, nativa VLAN isolada</td></tr>
+              <tr><td><strong>Sniffing passivo</strong></td><td>L1–L2</td><td>Captura de tráfego em segmento compartilhado</td><td>Criptografia end-to-end (TLS), switched infra</td></tr>
+              <tr><td><strong>DoS por SYN flood</strong></td><td>L4</td><td>Esgotamento de half-open connections</td><td>SYN cookies, rate limiting, scrubbing center</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-warn">
+          <span class="callout-label">Conceito Arquitetural</span>
+          Segmentação bem feita reduz movimentação lateral e facilita contenção (reduz o blast radius). O modelo Zero Trust expande esse princípio: nenhuma rede é inerentemente confiável, nem mesmo a interna. Cada acesso é autenticado, autorizado e inspecionado independentemente de sua origem topológica.
+        </div>
+      </div>
+      <div class="ch-footer">
+        <span class="ch-footer-left">Redes do Zero ao Avançado</span>
+        <span class="ch-footer-center">◆ ◆ ◆</span>
+        <span class="ch-footer-right">Capítulo 17 · Segurança · Mariana BS</span>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 18
+    ══════════════════════════════════════════════ -->
+    <div class="chapter" id="c18">
+      <div class="chapter-body">
+        <div class="ch-number">Capítulo 18</div>
+        <h2 class="ch-title">Wireless, Mobilidade e o Problema do Espectro Compartilhado</h2>
+        <p class="ch-subtitle">A complexidade adicional das redes que dependem do ar.</p>
+        <div class="ch-header-rule"></div>
+        <div class="ch-topics">
+          <span class="ch-topic">IEEE 802.11 ax/be</span>
+          <span class="ch-topic">CSMA/CA e OFDMA</span>
+          <span class="ch-topic">interferência e canal</span>
+          <span class="ch-topic">roaming e 802.11r</span>
+          <span class="ch-topic">WPA3</span>
+        </div>
+
+        <div class="prose">
+          <p>Em redes cabeadas, o meio é relativamente controlado. Em redes sem fio, o meio é compartilhado, invisível, variável e sensível a obstáculos, reflexão, ruído e coexistência. Isso torna o design wireless muito menos trivial do que "instalar access points".</p>
+
+          <h4>Evolução do Padrão Wi-Fi</h4>
+        </div>
+
+        <div class="tbl-wrap">
+          <table>
+            <caption>Tabela 18.1 — Evolução dos padrões IEEE 802.11</caption>
+            <thead>
+              <tr><th>Geração (Nome)</th><th>Padrão</th><th>Frequência</th><th>Taxa Máx. Teórica</th><th>Inovação Principal</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Wi-Fi 4</strong></td><td>802.11n</td><td>2,4 e 5 GHz</td><td>600 Mbps</td><td>MIMO, canais de 40 MHz, OFDM</td></tr>
+              <tr><td><strong>Wi-Fi 5</strong></td><td>802.11ac</td><td>5 GHz</td><td>3,5 Gbps</td><td>MU-MIMO downlink, canais 80/160 MHz, 256-QAM</td></tr>
+              <tr><td><strong>Wi-Fi 6</strong></td><td>802.11ax</td><td>2,4 e 5 GHz</td><td>9,6 Gbps</td><td>OFDMA, MU-MIMO uplink, BSS Coloring, TWT, 1024-QAM</td></tr>
+              <tr><td><strong>Wi-Fi 6E</strong></td><td>802.11ax ext.</td><td>6 GHz (novo)</td><td>9,6 Gbps</td><td>Espectro limpo de 6 GHz, sem dispositivos legados</td></tr>
+              <tr><td><strong>Wi-Fi 7</strong></td><td>802.11be</td><td>2,4 / 5 / 6 GHz</td><td>46 Gbps</td><td>320 MHz, 4096-QAM, Multi-Link Operation (MLO)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="prose">
+          <h4>Problema do Nó Oculto</h4>
+        </div>
+
+        <div class="diagram-wrap">
+          <svg viewBox="0 0 680 120" xmlns="http://www.w3.org/2000/svg" width="100%" height="120">
+            <!-- Hidden node problem -->
+            <text x="340" y="15" text-anchor="middle" font-size="9" fill="#6b5f50" font-family="'Courier Prime', monospace">Problema do Nó Oculto em redes wireless</text>
+            <!-- AP in center -->
+            <circle cx="340" cy="70" r="20" fill="#1a3a6b" stroke="#0a2040" stroke-width="2"/>
+            <text x="340" y="74" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace" font-weight="700">AP</text>
+            <!-- Node A -->
+            <circle cx="130" cy="70" r="16" fill="#1a4a2a" stroke="#0a2a10" stroke-width="1.5"/>
+            <text x="130" y="74" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace">A</text>
+            <!-- Node B -->
+            <circle cx="550" cy="70" r="16" fill="#8b1a1a" stroke="#4a0a0a" stroke-width="1.5"/>
+            <text x="550" y="74" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace">B</text>
+            <!-- Range circles -->
+            <circle cx="130" cy="70" r="220" fill="none" stroke="#1a4a2a" stroke-width="0.7" stroke-dasharray="5,4" opacity="0.5"/>
+            <circle cx="550" cy="70" r="220" fill="none" stroke="#8b1a1a" stroke-width="0.7" stroke-dasharray="5,4" opacity="0.5"/>
+            <!-- Range labels -->
+            <text x="60" y="38" font-size="7" fill="#1a4a2a" font-family="'Courier Prime', monospace">range A</text>
+            <text x="560" y="38" font-size="7" fill="#8b1a1a" font-family="'Courier Prime', monospace">range B</text>
+            <!-- Communication lines -->
+            <line x1="146" y1="70" x2="320" y2="70" stroke="#1a4a2a" stroke-width="1.5" stroke-dasharray="6,3"/>
+            <line x1="360" y1="70" x2="534" y2="70" stroke="#8b1a1a" stroke-width="1.5" stroke-dasharray="6,3"/>
+            <!-- X between A and B -->
+            <text x="340" y="105" text-anchor="middle" font-size="8" fill="#8b1a1a" font-family="'Courier Prime', monospace">A e B não se escutam → ambos transmitem → colisão no AP</text>
+          </svg>
+          <div class="diagram-caption">Fig. 18.1 — Nó oculto: A e B estão no range do AP mas fora do range um do outro; o CSMA padrão falha</div>
+        </div>
+
+        <div class="callout callout-note">
+          <span class="callout-label">Solução: RTS/CTS</span>
+          O mecanismo RTS/CTS (Request-to-Send / Clear-to-Send) mitiga o problema do nó oculto: o transmissor solicita ao AP permissão para transmitir; o AP anuncia o Canal ocupado para todos os nós no seu alcance, incluindo B — que então se abstém de transmitir. Custo: overhead adicional, especialmente para frames pequenos.
+        </div>
+      </div>
+      <div class="ch-footer">
+        <span class="ch-footer-left">Redes do Zero ao Avançado</span>
+        <span class="ch-footer-center">◆ ◆ ◆</span>
+        <span class="ch-footer-right">Capítulo 18 · Wireless · Mariana BS</span>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 19
+    ══════════════════════════════════════════════ -->
+    <div class="chapter" id="c19">
+      <div class="chapter-body">
+        <div class="ch-number">Capítulo 19</div>
+        <h2 class="ch-title">WAN, Data Center, Underlay/Overlay e Cloud</h2>
+        <p class="ch-subtitle">Da rede local à infraestrutura distribuída de escala elevada.</p>
+        <div class="ch-header-rule"></div>
+        <div class="ch-topics">
+          <span class="ch-topic">SD-WAN e MPLS</span>
+          <span class="ch-topic">spine-leaf topology</span>
+          <span class="ch-topic">VXLAN e overlay</span>
+          <span class="ch-topic">IaaS networking</span>
+          <span class="ch-topic">leste-oeste vs norte-sul</span>
+        </div>
+
+        <div class="prose">
+          <p>À medida que a rede cresce, conectividade local deixa de ser a única preocupação. Surgem longa distância, múltiplas localidades, diversidade de links, tráfego leste-oeste, virtualização, overlays e recursos definidos por software.</p>
+
+          <h4>Topologia Spine-Leaf em Data Centers</h4>
+        </div>
+
+        <div class="diagram-wrap">
+          <svg viewBox="0 0 680 150" xmlns="http://www.w3.org/2000/svg" width="100%" height="150">
+            <!-- Spine-leaf topology -->
+            <text x="340" y="14" text-anchor="middle" font-size="9" fill="#6b5f50" font-family="'Courier Prime', monospace">Topologia Spine-Leaf — Data Center moderno</text>
+            <!-- Spines -->
+            <rect x="170" y="25" width="110" height="30" fill="#1a3a6b" stroke="none"/>
+            <text x="225" y="44" text-anchor="middle" font-size="9" fill="#f5f0e8" font-family="'Courier Prime', monospace" font-weight="700">Spine 1</text>
+            <rect x="400" y="25" width="110" height="30" fill="#1a3a6b" stroke="none"/>
+            <text x="455" y="44" text-anchor="middle" font-size="9" fill="#f5f0e8" font-family="'Courier Prime', monospace" font-weight="700">Spine 2</text>
+            <!-- Leaves -->
+            <rect x="60" y="100" width="80" height="30" fill="#1a4a2a" stroke="none"/>
+            <text x="100" y="119" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace">Leaf 1</text>
+            <rect x="180" y="100" width="80" height="30" fill="#1a4a2a" stroke="none"/>
+            <text x="220" y="119" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace">Leaf 2</text>
+            <rect x="300" y="100" width="80" height="30" fill="#1a4a2a" stroke="none"/>
+            <text x="340" y="119" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace">Leaf 3</text>
+            <rect x="420" y="100" width="80" height="30" fill="#1a4a2a" stroke="none"/>
+            <text x="460" y="119" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace">Leaf 4</text>
+            <rect x="540" y="100" width="80" height="30" fill="#1a4a2a" stroke="none"/>
+            <text x="580" y="119" text-anchor="middle" font-size="8" fill="#f5f0e8" font-family="'Courier Prime', monospace">Leaf 5</text>
+            <!-- Spine1 to all leaves -->
+            <line x1="225" y1="55" x2="100" y2="100" stroke="#1a3a6b" stroke-width="1"/>
+            <line x1="225" y1="55" x2="220" y2="100" stroke="#1a3a6b" stroke-width="1"/>
+            <line x1="225" y1="55" x2="340" y2="100" stroke="#1a3a6b" stroke-width="1"/>
+            <line x1="225" y1="55" x2="460" y2="100" stroke="#1a3a6b" stroke-width="1"/>
+            <line x1="225" y1="55" x2="580" y2="100" stroke="#1a3a6b" stroke-width="1"/>
+            <!-- Spine2 to all leaves -->
+            <line x1="455" y1="55" x2="100" y2="100" stroke="#1a4a2a" stroke-width="1"/>
+            <line x1="455" y1="55" x2="220" y2="100" stroke="#1a4a2a" stroke-width="1"/>
+            <line x1="455" y1="55" x2="340" y2="100" stroke="#1a4a2a" stroke-width="1"/>
+            <line x1="455" y1="55" x2="460" y2="100" stroke="#1a4a2a" stroke-width="1"/>
+            <line x1="455" y1="55" x2="580" y2="100" stroke="#1a4a2a" stroke-width="1"/>
+            <!-- label -->
+            <text x="340" y="145" text-anchor="middle" font-size="8" fill="#6b5f50" font-family="'Courier Prime', monospace">Latência uniforme entre qualquer par de servidores · 2 saltos garantidos · ECMP nativo</text>
+          </svg>
+          <div class="diagram-caption">Fig. 19.1 — Spine-Leaf: todo servidor atinge qualquer outro em exatamente 2 saltos de rede</div>
+        </div>
+
+        <div class="prose">
+          <h4>Underlay vs Overlay</h4>
+        </div>
+
+        <div class="formula">
+          <span class="formula-label">Tabela 19.1 — Underlay vs Overlay: conceitos e exemplos</span>
+UNDERLAY: infraestrutura física real de transporte
+  · Protocolos: OSPF, ISIS, BGP, Ethernet, IP
+  · Responsabilidade: alcançabilidade, redundância, velocidade
+  · Exemplo: rede IP/MPLS entre datacenters
+
+OVERLAY: rede lógica construída sobre o underlay
+  · Protocolos: VXLAN, GRE, GENEVE, IPsec, WireGuard
+  · Responsabilidade: segmentação, mobilidade, abstração, multi-tenancy
+  · Exemplo: VXLAN sobre IP para conectar VMs em hypervisors distintos
+
+Vantagem da separação:
+  → Overlay pode mover VMs e políticas sem mudar underlay
+  → Underlay pode evoluir sem impactar serviços de overlay
+  → Multi-tenancy: diferentes tenants com namespaces isolados no mesmo hardware</div>
+
+        <div class="callout callout-note">
+          <span class="callout-label">Cloud como Rede Programável</span>
+          Na nuvem, a rede continua existindo em toda a sua complexidade, mas seus objetos tornam-se APIs, templates e políticas programáveis: VPCs, security groups, route tables, NAT gateways, load balancers e peering são todos construtos de rede — apenas expressos em código (IaC). Quem entende rede de verdade percebe que cloud não aboliu fundamentos; apenas os reempacotou.
+        </div>
+      </div>
+      <div class="ch-footer">
+        <span class="ch-footer-left">Redes do Zero ao Avançado</span>
+        <span class="ch-footer-center">◆ ◆ ◆</span>
+        <span class="ch-footer-right">Capítulo 19 · WAN e Cloud · Mariana BS</span>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 20
+    ══════════════════════════════════════════════ -->
+    <div class="chapter" id="c20">
+      <div class="chapter-body">
+        <div class="ch-number">Capítulo 20</div>
+        <h2 class="ch-title">Confiabilidade, Troubleshooting e Visão de Arquitetura</h2>
+        <p class="ch-subtitle">O ponto em que redes deixam de ser configuração e passam a ser engenharia sistêmica.</p>
+        <div class="ch-header-rule"></div>
+        <div class="ch-topics">
+          <span class="ch-topic">Alta disponibilidade</span>
+          <span class="ch-topic">MTTR · MTBF · SLA</span>
+          <span class="ch-topic">metodologia de diagnóstico</span>
+          <span class="ch-topic">trade-offs de arquitetura</span>
+          <span class="ch-topic">observabilidade</span>
+        </div>
+
+        <div class="prose">
+          <p>Redes reais falham. Enlaces caem, tabelas convergem mal, broadcast storms acontecem, nomes deixam de resolver, autenticações expiram, buffers saturam e mudanças humanas introduzem comportamento inesperado. Por isso, uma visão madura precisa incluir não só funcionamento ideal, mas também comportamento sob falha.</p>
+
+          <h4>Métricas de Confiabilidade</h4>
+        </div>
+
+        <div class="formula">
+          <span class="formula-label">Fórmula 20.1 — Disponibilidade e métricas de confiabilidade</span>
+Disponibilidade  =  MTBF / (MTBF + MTTR)  × 100%
+
+Onde:  MTBF = Mean Time Between Failures (tempo médio entre falhas)
+       MTTR = Mean Time to Repair (tempo médio de reparo)
+
+Noves de disponibilidade:
+  99%    → ≤ 3,65 dias/ano   de indisponibilidade  (2 noves)
+  99,9%  → ≤ 8,76 horas/ano                       (3 noves)
+  99,99% → ≤ 52,6 min/ano                          (4 noves)
+  99,999%→ ≤ 5,26 min/ano                          (5 noves)
+
+Disponibilidade de sistema redundante:
+  A_sistema = 1 - (1 - A_componente)^n   [n componentes em paralelo]
+
+Exemplo: dois links de 99,9% em paralelo:
+  A = 1 - (1-0.999)² = 1 - 0.000001 = 99,9999%</div>
+
+        <div class="prose">
+          <h4>Metodologia de Troubleshooting por Camadas</h4>
+        </div>
+
+        <div class="tbl-wrap">
+          <table>
+            <caption>Tabela 20.1 — Framework de diagnóstico sistemático por camada OSI</caption>
+            <thead>
+              <tr><th>Camada</th><th>Perguntas-chave</th><th>Ferramentas</th><th>Evidências buscadas</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>L1 – Física</strong></td><td>Link up? Erros físicos? Cabo correto?</td><td>ifconfig, ip link, show int</td><td>CRC errors, runts, giants, carrier</td></tr>
+              <tr><td><strong>L2 – Enlace</strong></td><td>MAC aprendido? VLAN correta? STP bloqueando?</td><td>show mac table, show spanning-tree</td><td>Tabela CAM vazia, porta em BLK</td></tr>
+              <tr><td><strong>L3 – Rede</strong></td><td>Rota existe? ARP resolvido? TTL ok?</td><td>ip route, ping, traceroute, arp -n</td><td>Ausência de rota, ARP incompleto</td></tr>
+              <tr><td><strong>L4 – Transporte</strong></td><td>Porta aberta? Firewall bloqueando? RST recebido?</td><td>ss, netstat, tcpdump, telnet porta</td><td>Connection refused, timeout, RST</td></tr>
+              <tr><td><strong>L7 – Aplicação</strong></td><td>DNS resolve? Certificado válido? App responde?</td><td>dig, curl -v, nslookup, openssl s_client</td><td>NXDOMAIN, cert expirado, HTTP 5xx</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="prose">
+          <h4>Visão de Arquitetura — O Que Distingue o Nível Expert</h4>
+          <p>O nível expert nasce quando a pessoa passa a pensar em limites, blast radius, clareza, custo operacional, observabilidade, escalabilidade e manutenção futura. Não é o acúmulo de comandos que cria maturidade. É a capacidade de desenhar sistemas compreensíveis, resilientes e alinhados ao serviço que precisam sustentar.</p>
+        </div>
+
+        <div class="callout">
+          <span class="callout-label">Epílogo</span>
+          O sinal de maturidade em redes não é decorar mais protocolos. É conseguir explicar, prever, medir e corrigir o comportamento de um sistema complexo com método. Uma rede bem desenhada é aquela que falha de forma previsível, recupera-se de forma controlada e cujo comportamento sob carga pode ser modelado — não apenas observado após o fato.
+        </div>
+
+        <div class="ornament">· · · · · ✦ · · · · ·</div>
+      </div>
+      <div class="ch-footer">
+        <span class="ch-footer-left">Redes do Zero ao Avançado</span>
+        <span class="ch-footer-center">◆ ◆ ◆</span>
+        <span class="ch-footer-right">Capítulo 20 · Arquitetura · Mariana BS</span>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- SITE FOOTER -->
+<footer class="site-footer">
+  <div class="footer-brand"><span>Mariana BS</span> · Be Safe · Redes do Zero ao Avançado</div>
+  <div class="footer-sub">Edição 2026 · Todos os direitos reservados · marianabs.com.br</div>
+</footer>
+
+<script>
+(function () {
+  const header = document.querySelector('.site-header');
+  const menuBtn = document.getElementById('menuBtn');
+  const mobileMenu = document.getElementById('mobileMenu');
+  const menuClose = document.getElementById('menuClose');
+  const menuOverlay = document.getElementById('menuOverlay');
+  const tocLinks = Array.from(document.querySelectorAll('[data-target]'));
+  const chapterLinks = Array.from(document.querySelectorAll('.toc-list [data-target], .menu-drawer-body [data-target], .site-nav-pills [data-target]'));
+  const sections = Array.from(document.querySelectorAll('#intro, [id^="c"]'));
+
+  function getHeaderOffset() {
+    return (header ? header.offsetHeight : 0) + 8;
+  }
+
+  function openMenu() {
+    if (!mobileMenu || !menuBtn) return;
+    mobileMenu.classList.add('open');
+    menuBtn.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMenu() {
+    if (!mobileMenu || !menuBtn) return;
+    mobileMenu.classList.remove('open');
+    menuBtn.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function toggleMenu(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (!mobileMenu || !menuBtn) return;
+    const isOpen = mobileMenu.classList.contains('open');
+    if (isOpen) closeMenu();
+    else openMenu();
+  }
+
+  function scrollToTarget(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const top = el.getBoundingClientRect().top + window.pageYOffset - getHeaderOffset();
+    window.scrollTo({ top, behavior: 'smooth' });
+  }
+
+  tocLinks.forEach(link => {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const id = this.getAttribute('data-target');
+      if (!id) return;
+      scrollToTarget(id);
+      closeMenu();
+      history.replaceState(null, '', '#' + id);
+    });
+  });
+
+  if (menuBtn) menuBtn.addEventListener('click', toggleMenu);
+  if (menuClose) menuClose.addEventListener('click', function(e){ e.preventDefault(); closeMenu(); });
+  if (menuOverlay) menuOverlay.addEventListener('click', function(e){ e.preventDefault(); closeMenu(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeMenu();
+  });
+
+  function setActive(id) {
+    document.querySelectorAll('.toc-list [data-target]').forEach(l => {
+      l.style.color = '';
+      l.style.borderLeftColor = '';
+    });
+    document.querySelectorAll('.menu-drawer-body [data-target]').forEach(l => {
+      l.classList.remove('menu-active');
+    });
+    document.querySelectorAll('.site-nav-pills [data-target]').forEach(l => {
+      l.style.color = '';
+      l.style.borderColor = '';
+      l.style.background = '';
+    });
+
+    const sidebarLink = document.querySelector('.toc-list [data-target="' + id + '"]');
+    if (sidebarLink) {
+      sidebarLink.style.color = '#c8b88a';
+      sidebarLink.style.borderLeftColor = '#8b1a1a';
+    }
+
+    const drawerLink = document.querySelector('.menu-drawer-body [data-target="' + id + '"]');
+    if (drawerLink) drawerLink.classList.add('menu-active');
+
+    const topLink = document.querySelector('.site-nav-pills [data-target="' + id + '"]');
+    if (topLink) {
+      topLink.style.color = '#c8b88a';
+      topLink.style.borderColor = '#5a4a30';
+      topLink.style.background = 'rgba(200,184,138,0.08)';
+    }
+  }
+
+  function detectActiveSection() {
+    const offset = getHeaderOffset() + 20;
+    let current = sections[0] ? sections[0].id : 'intro';
+    for (const section of sections) {
+      if (section.offsetTop - offset <= window.scrollY) {
+        current = section.id;
+      }
+    }
+    setActive(current);
+  }
+
+  window.addEventListener('scroll', detectActiveSection, { passive: true });
+  window.addEventListener('resize', detectActiveSection);
+
+  // Initial state
+  if (window.location.hash) {
+    const id = window.location.hash.slice(1);
+    setTimeout(() => scrollToTarget(id), 50);
+  } else {
+    detectActiveSection();
+  }
+})();
+</script>
+</body>
+</html>
